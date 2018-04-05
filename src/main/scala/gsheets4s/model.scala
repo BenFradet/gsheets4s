@@ -1,5 +1,6 @@
 package gsheets4s
 
+import cats.implicits._
 import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
@@ -9,17 +10,29 @@ object model {
   type Row = Forall[UpperCase]
   type Col = Positive
 
-  final case class Range(
-    startRow: Row,
-    startCol: Col,
-    endRow: Row,
-    endCol: Col
-  )
+  final case class Position(row: Option[Row], col: Option[Col]) {
+    def stringRepresentation: String = row.getOrElse("") + col.foldMap(_.toString)
+  }
+
+  final case class Range(start: Position, end: Position) {
+    def stringRepresentation: String = start.stringRepresentation + ":" + end.stringRepresentation
+  }
 
   final case class A1Notation(
     sheetName: Option[String],
     range: Option[Range]
-  )
+  ) {
+    def stringRepresentation: String = (sheetName, range) match {
+      case (Some(n), Some(r)) => s"$n!${r.stringRepresentation}"
+      case (Some(sheetName), None) => sheetName
+      case (None, Some(range)) => range.stringRepresentation
+      // shortcoming
+      case _ => ""
+    }
+  }
+
+  implicit val a1NotationEncoder: Encoder[A1Notation] =
+    Encoder.encodeString.contramap(_.stringRepresentation)
 
   sealed abstract class Dimension(val value: String)
   case object Rows extends Dimension("ROWS")
@@ -29,7 +42,6 @@ object model {
     case Rows.value => Rows
     case Columns.value => Columns
   }
-
   implicit val dimensionEncoder: Encoder[Dimension] = Encoder.encodeString.contramap(_.value)
 
   final case class ValueRange(
