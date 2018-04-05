@@ -28,6 +28,7 @@ lazy val baseSettings = Seq(
 )
 
 lazy val catsVersion = "1.1.0"
+lazy val circeVersion = "0.9.3"
 lazy val refinedVersion = "0.8.7"
 lazy val scalatestVersion = "3.0.5"
 
@@ -39,6 +40,10 @@ lazy val gsheets4s = project.in(file("."))
       "org.typelevel" %% "cats-core" % catsVersion,
       "eu.timepit" %% "refined" % refinedVersion
     ) ++ Seq(
+      "io.circe" %% "circe-core",
+      "io.circe" %% "circe-generic",
+      "io.circe" %% "circe-parser"
+    ).map(_ % circeVersion) ++ Seq(
       "org.scalatest" %% "scalatest" % scalatestVersion
     ).map(_ % "test")
   )

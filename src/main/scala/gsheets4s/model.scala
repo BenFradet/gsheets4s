@@ -1,10 +1,9 @@
 package gsheets4s
 
-import eu.timepit.refined._
 import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
-import eu.timepit.refined.string._
+import io.circe.{Decoder, Encoder}
 
 object model {
   type Row = Forall[UpperCase]
@@ -25,6 +24,13 @@ object model {
   sealed abstract class Dimension(val value: String)
   case object Rows extends Dimension("ROWS")
   case object Columns extends Dimension("COLUMNS")
+
+  implicit val dimensionDecoder: Decoder[Dimension] = Decoder.decodeString.map {
+    case Rows.value => Rows
+    case Columns.value => Columns
+  }
+
+  implicit val dimensionEncoder: Encoder[Dimension] = Encoder.encodeString.contramap(_.value)
 
   final case class ValueRange(
     range: A1Notation,
