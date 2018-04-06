@@ -1,26 +1,58 @@
 package gsheets4s
 
-import cats.implicits._
+import scala.util.Try
+
+import cats.syntax.either._
+import eu.timepit.refined._
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
 import io.circe.{Decoder, Encoder}
 
 object model {
-  type Row = Forall[UpperCase]
-  type Col = Positive
+  type ValidRow = Positive
+  type Row = Int Refined ValidRow
+  type ValidCol = Forall[UpperCase]
+  type Col = String Refined ValidCol
 
   sealed trait Position {
     def stringRepresentation: String
   }
-  final case class RowPosition(row: Row) extends Position {
-    override def stringRepresentation: String = row.toString
-  }
   final case class ColPosition(col: Col) extends Position {
     override def stringRepresentation: String = col.toString
   }
-  final case class RowColPosition(row: Row, col: Col) extends Position {
-    override def stringRepresentation: String = s"$row${col.toString}"
+  object ColPosition {
+    def parse(s: String): Either[String, ColPosition] = refineV[ValidCol](s).map(ColPosition(_))
+  }
+  final case class RowPosition(row: Row) extends Position {
+    override def stringRepresentation: String = row.toString
+  }
+  object RowPosition {
+    def parse(s: String): Either[String, RowPosition] =
+      for {
+        int <- Try(s.toInt).toEither.leftMap(_.getMessage)
+        col <- refineV[ValidRow](int)
+        rowPos = RowPosition(col)
+      } yield rowPos
+  }
+  final case class ColRowPosition(col: Col, row: Row) extends Position {
+    override def stringRepresentation: String = s"$col${row.toString}"
+  }
+  object ColRowPosition {
+    def parse(s: String): Either[String, ColRowPosition] = {
+      val (chars, digits) = s.foldLeft((List.empty[Char], List.empty[Char])) { case ((cs, ds), c) =>
+        if (c.isDigit) (cs, c :: ds)
+        else (c :: cs, ds)
+      }
+      for {
+        int <- Try(digits.reverse.mkString.toInt).toEither.leftMap(_.getMessage)
+        row <- refineV[ValidRow](int)
+        str = chars.reverse.mkString
+        col <- refineV[ValidCol](str)
+        colRow = ColRowPosition(col, row)
+      } yield colRow
+    }
   }
 
   final case class Range(start: Position, end: Position) {
