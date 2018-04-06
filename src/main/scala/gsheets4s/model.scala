@@ -10,25 +10,34 @@ object model {
   type Row = Forall[UpperCase]
   type Col = Positive
 
-  final case class Position(row: Option[Row], col: Option[Col]) {
-    def stringRepresentation: String = row.getOrElse("") + col.foldMap(_.toString)
+  sealed trait Position {
+    def stringRepresentation: String
+  }
+  final case class RowPosition(row: Row) extends Position {
+    override def stringRepresentation: String = row.toString
+  }
+  final case class ColPosition(col: Col) extends Position {
+    override def stringRepresentation: String = col.toString
+  }
+  final case class RowColPosition(row: Row, col: Col) extends Position {
+    override def stringRepresentation: String = s"$row${col.toString}"
   }
 
   final case class Range(start: Position, end: Position) {
-    def stringRepresentation: String = start.stringRepresentation + ":" + end.stringRepresentation
+    def stringRepresentation: String = s"${start.stringRepresentation}:${end.stringRepresentation}"
   }
 
-  final case class A1Notation(
-    sheetName: Option[String],
-    range: Option[Range]
-  ) {
-    def stringRepresentation: String = (sheetName, range) match {
-      case (Some(n), Some(r)) => s"$n!${r.stringRepresentation}"
-      case (Some(sheetName), None) => sheetName
-      case (None, Some(range)) => range.stringRepresentation
-      // shortcoming
-      case _ => ""
-    }
+  sealed trait A1Notation {
+    def stringRepresentation: String
+  }
+  final case class SheetNameNotation(sheetName: String) extends A1Notation {
+    override def stringRepresentation: String = sheetName
+  }
+  final case class RangeNotation(range: Range) extends A1Notation {
+    override def stringRepresentation: String = range.stringRepresentation
+  }
+  final case class SheetNameRangeNotation(sheetName: String, range: Range) extends A1Notation {
+    override def stringRepresentation: String = s"$sheetName!${range.stringRepresentation}"
   }
 
   implicit val a1NotationEncoder: Encoder[A1Notation] =
