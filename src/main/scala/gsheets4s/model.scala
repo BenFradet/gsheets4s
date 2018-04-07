@@ -8,7 +8,7 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, DecodingFailure, Encoder, HCursor}
 
 object model {
   type ValidRow = Positive
@@ -106,14 +106,19 @@ object model {
       }
     }
   }
-
+  implicit val a1NotationDecoder: Decoder[A1Notation] = Decoder.decodeString.flatMap { s =>
+    new Decoder[A1Notation] {
+      final def apply(c: HCursor): Decoder.Result[A1Notation] =
+        (SheetNameNotation.parse(s) orElse RangeNotation.parse(s) orElse SheetNameNotation.parse(s))
+          .leftMap(DecodingFailure(_, c.history))
+    }
+  }
   implicit val a1NotationEncoder: Encoder[A1Notation] =
     Encoder.encodeString.contramap(_.stringRepresentation)
 
   sealed abstract class Dimension(val value: String)
   case object Rows extends Dimension("ROWS")
   case object Columns extends Dimension("COLUMNS")
-
   implicit val dimensionDecoder: Decoder[Dimension] = Decoder.decodeString.map {
     case Rows.value => Rows
     case Columns.value => Columns
