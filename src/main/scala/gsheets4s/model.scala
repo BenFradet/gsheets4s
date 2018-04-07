@@ -83,11 +83,28 @@ object model {
   final case class SheetNameNotation(sheetName: String) extends A1Notation {
     override def stringRepresentation: String = sheetName
   }
+  object SheetNameNotation {
+    def parse(s: String): Either[String, SheetNameNotation] = Right(SheetNameNotation(s))
+  }
   final case class RangeNotation(range: Range) extends A1Notation {
     override def stringRepresentation: String = range.stringRepresentation
   }
+  object RangeNotation {
+    def parse(s: String): Either[String, RangeNotation] = Range.parse(s).map(RangeNotation(_))
+  }
   final case class SheetNameRangeNotation(sheetName: String, range: Range) extends A1Notation {
     override def stringRepresentation: String = s"$sheetName!${range.stringRepresentation}"
+  }
+  object SheetNameRangeNotation {
+    def parse(s: String): Either[String, SheetNameRangeNotation] = {
+      val splits = s.split("!")
+      if (splits.length == 2) {
+        val Array(sheetName, range) = splits
+        Range.parse(range).map(SheetNameRangeNotation(sheetName, _))
+      } else {
+        Left("Invalid notation, must be in the sheetName!range format")
+      }
+    }
   }
 
   implicit val a1NotationEncoder: Encoder[A1Notation] =
