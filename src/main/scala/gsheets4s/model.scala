@@ -59,14 +59,14 @@ object model {
     def stringRepresentation: String = s"${start.stringRepresentation}:${end.stringRepresentation}"
   }
   object Range {
+    private val parsingFunctions =
+      List(ColPosition.parse _, RowPosition.parse _, ColRowPosition.parse _)
     def parse(s: String): Either[String, Range] = {
       val splits = s.split(":")
       if (splits.length == 2) {
         val Array(start, end) = splits
-        val startPos = ColPosition.parse(start) orElse RowPosition.parse(start) orElse
-          ColRowPosition.parse(start)
-        val endPos = ColPosition.parse(end) orElse RowPosition.parse(end) orElse
-          ColRowPosition.parse(end)
+        val startPos = parsingFunctions.map(_.apply(start)).reduce(_ orElse _)
+        val endPos = parsingFunctions.map(_.apply(end)).reduce(_ orElse _)
         for {
           startP <- startPos
           endP <- endPos
@@ -109,7 +109,9 @@ object model {
   implicit val a1NotationDecoder: Decoder[A1Notation] = Decoder.decodeString.flatMap { s =>
     new Decoder[A1Notation] {
       final def apply(c: HCursor): Decoder.Result[A1Notation] =
-        (SheetNameNotation.parse(s) orElse RangeNotation.parse(s) orElse SheetNameNotation.parse(s))
+        List(SheetNameNotation.parse _, RangeNotation.parse _, SheetNameNotation.parse _)
+          .map(_.apply(s))
+          .reduce(_ orElse _)
           .leftMap(DecodingFailure(_, c.history))
     }
   }
