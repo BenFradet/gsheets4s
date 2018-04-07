@@ -58,6 +58,24 @@ object model {
   final case class Range(start: Position, end: Position) {
     def stringRepresentation: String = s"${start.stringRepresentation}:${end.stringRepresentation}"
   }
+  object Range {
+    def parse(s: String): Either[String, Range] = {
+      val splits = s.split(":")
+      if (splits.length == 2) {
+        val Array(start, end) = splits
+        val startPos = ColPosition.parse(start) orElse RowPosition.parse(start) orElse
+          ColRowPosition.parse(start)
+        val endPos = ColPosition.parse(end) orElse RowPosition.parse(end) orElse
+          ColRowPosition.parse(end)
+        for {
+          startP <- startPos
+          endP <- endPos
+        } yield Range(startP, endP)
+      } else {
+        Left("Invalid range, must be in the colrow:colrow format")
+      }
+    }
+  }
 
   sealed trait A1Notation {
     def stringRepresentation: String
