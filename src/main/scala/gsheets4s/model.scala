@@ -1,9 +1,10 @@
 package gsheets4s
 
-import scala.util.Try
-
+import atto._
+import atto.Atto._
+import atto.syntax.refined._
+import cats.implicits._
 import cats.syntax.either._
-import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
@@ -19,99 +20,54 @@ object model {
   sealed trait Position {
     def stringRepresentation: String
   }
+  object Position {
+    val parser: Parser[Position] = {
+      val colP = stringOf1(upper).refined[ValidCol]
+      val rowP = int.refined[ValidRow]
+      colP.map(ColPosition(_): Position) |
+        rowP.map(RowPosition(_): Position) |
+        (colP, rowP).mapN(ColRowPosition(_, _): Position)
+    }
+  }
   final case class ColPosition(col: Col) extends Position {
     override def stringRepresentation: String = col.toString
-  }
-  object ColPosition {
-    def parse(s: String): Either[String, ColPosition] = refineV[ValidCol](s).map(ColPosition(_))
   }
   final case class RowPosition(row: Row) extends Position {
     override def stringRepresentation: String = row.toString
   }
-  object RowPosition {
-    def parse(s: String): Either[String, RowPosition] =
-      for {
-        int <- Try(s.toInt).toEither.leftMap(_.getMessage)
-        col <- refineV[ValidRow](int)
-        rowPos = RowPosition(col)
-      } yield rowPos
-  }
   final case class ColRowPosition(col: Col, row: Row) extends Position {
     override def stringRepresentation: String = s"$col${row.toString}"
-  }
-  object ColRowPosition {
-    def parse(s: String): Either[String, ColRowPosition] = {
-      val (chars, digits) = s.foldLeft((List.empty[Char], List.empty[Char])) { case ((cs, ds), c) =>
-        if (c.isDigit) (cs, c :: ds)
-        else (c :: cs, ds)
-      }
-      for {
-        int <- Try(digits.reverse.mkString.toInt).toEither.leftMap(_.getMessage)
-        row <- refineV[ValidRow](int)
-        str = chars.reverse.mkString
-        col <- refineV[ValidCol](str)
-        colRow = ColRowPosition(col, row)
-      } yield colRow
-    }
   }
 
   final case class Range(start: Position, end: Position) {
     def stringRepresentation: String = s"${start.stringRepresentation}:${end.stringRepresentation}"
   }
   object Range {
-    private val parsingFunctions =
-      List(ColPosition.parse _, RowPosition.parse _, ColRowPosition.parse _)
-    def parse(s: String): Either[String, Range] = {
-      val splits = s.split(":")
-      if (splits.length == 2) {
-        val Array(start, end) = splits
-        val startPos = parsingFunctions.map(_.apply(start)).reduce(_ orElse _)
-        val endPos = parsingFunctions.map(_.apply(end)).reduce(_ orElse _)
-        for {
-          startP <- startPos
-          endP <- endPos
-        } yield Range(startP, endP)
-      } else {
-        Left("Invalid range, must be in the colrow:colrow format")
-      }
-    }
+    val parser: Parser[Range] = (Position.parser <~ Atto.char(':'), Position.parser).mapN(Range.apply)
   }
 
   sealed trait A1Notation {
     def stringRepresentation: String
   }
+  object A1Notation {
+    val parser: Parser[A1Notation] =
+      (takeWhile(_ != '!') <~ Atto.char('!'), Range.parser).mapN(SheetNameRangeNotation.apply) |
+        Range.parser.map(RangeNotation(_): A1Notation) |
+        stringOf1(elem(_ => true)).map(SheetNameNotation(_): A1Notation)
+  }
   final case class SheetNameNotation(sheetName: String) extends A1Notation {
     override def stringRepresentation: String = sheetName
-  }
-  object SheetNameNotation {
-    def parse(s: String): Either[String, SheetNameNotation] = Right(SheetNameNotation(s))
   }
   final case class RangeNotation(range: Range) extends A1Notation {
     override def stringRepresentation: String = range.stringRepresentation
   }
-  object RangeNotation {
-    def parse(s: String): Either[String, RangeNotation] = Range.parse(s).map(RangeNotation(_))
-  }
   final case class SheetNameRangeNotation(sheetName: String, range: Range) extends A1Notation {
     override def stringRepresentation: String = s"$sheetName!${range.stringRepresentation}"
-  }
-  object SheetNameRangeNotation {
-    def parse(s: String): Either[String, SheetNameRangeNotation] = {
-      val splits = s.split("!")
-      if (splits.length == 2) {
-        val Array(sheetName, range) = splits
-        Range.parse(range).map(SheetNameRangeNotation(sheetName, _))
-      } else {
-        Left("Invalid notation, must be in the sheetName!range format")
-      }
-    }
   }
   implicit val a1NotationDecoder: Decoder[A1Notation] = Decoder.decodeString.flatMap { s =>
     new Decoder[A1Notation] {
       final def apply(c: HCursor): Decoder.Result[A1Notation] =
-        List(SheetNameNotation.parse _, RangeNotation.parse _, SheetNameNotation.parse _)
-          .map(_.apply(s))
-          .reduce(_ orElse _)
+        A1Notation.parser.parseOnly(s).either
           .leftMap(DecodingFailure(_, c.history))
     }
   }
