@@ -10,24 +10,21 @@ import model._
 object ModelSpec extends Properties("model") {
   import Prop._
 
-  val nonEmptyUpperStrGen: Gen[List[Char]] = Gen.nonEmptyListOf(Gen.choose('A', 'Z'))
   implicit def arbRow: Arbitrary[Row] = arbitraryFromValidate
+  val nonEmptyUpperStrGen: Gen[String] =
+    Gen.nonEmptyListOf(Gen.choose('A', 'Z')).map(_.mkString)
+  implicit def arbCol: Arbitrary[Col] =
+    arbitraryFromValidate(implicitly, implicitly, Arbitrary(nonEmptyUpperStrGen))
 
-  property("ColPosition parser") = forAll(nonEmptyUpperStrGen) { c =>
-    Position.parser.parseOnly(c.mkString).option match {
-      case Some(ColPosition(_)) => true
-      case _ => false
-    }
+  property("ColPosition parser") = forAll { c: Col =>
+    Position.parser.parseOnly(c.toString).option == Some(ColPosition(c))
   }
 
   property("RowPosition parser") = forAll { (r: Row) =>
     Position.parser.parseOnly(r.toString).option == Some(RowPosition(r))
   }
 
-  property("ColRowPosition parser") = forAll(nonEmptyUpperStrGen, arbRow.arbitrary) { (c, r) =>
-    Position.parser.parseOnly(c.mkString + r.toString).either match {
-      case Right(ColRowPosition(_, _)) => true
-      case e => println(e); false
-    }
+  property("ColRowPosition parser") = forAll { (c: Col, r: Row) =>
+    Position.parser.parseOnly(c.toString + r.toString).option == Some(ColRowPosition(c, r))
   }
 }
