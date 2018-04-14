@@ -8,13 +8,14 @@ import cats.syntax.apply._
 import cats.syntax.either._
 import cats.syntax.show._
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.boolean._
 import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
 import io.circe.{Decoder, DecodingFailure, Encoder, HCursor}
 
 object model {
-  type ValidCol = Forall[UpperCase]
+  type ValidCol = NonEmpty And Forall[UpperCase]
   type Col = String Refined ValidCol
   type ValidRow = Positive
   type Row = Int Refined ValidRow
@@ -27,11 +28,11 @@ object model {
       case ColRowPosition(c, r) => s"$c${r.toString}"
     }
     val parser: Parser[Position] = {
-      val colP = stringOf1(upper).refined[ValidCol]
-      val rowP = int.refined[ValidRow]
-      colP.map(ColPosition(_): Position) |
-        rowP.map(RowPosition(_): Position) |
-        (colP, rowP).mapN(ColRowPosition(_, _): Position)
+      val colP = stringOf1(upper).refined[ValidCol].namedOpaque("col")
+      val rowP = int.refined[ValidRow].namedOpaque("row")
+      (colP, rowP).mapN(ColRowPosition(_, _): Position) |
+        colP.map(ColPosition(_): Position) |
+        rowP.map(RowPosition(_): Position)
     }
   }
   final case class ColPosition(col: Col) extends Position
@@ -40,7 +41,7 @@ object model {
 
   final case class Range(start: Position, end: Position)
   object Range {
-    implicit val showRange: Show[Range] = Show.show(r => s"${r.start.show}:${r.end.show}")
+    implicit val showRange: Show[Range] = Show.show(r => s"${r.start}:${r.end}")
     val parser: Parser[Range] = (Position.parser <~ Atto.char(':'), Position.parser).mapN(Range.apply)
   }
 
@@ -49,7 +50,7 @@ object model {
     implicit val showA1Notation: Show[A1Notation] = Show.show {
       case SheetNameNotation(s) => s
       case RangeNotation(r) => r.show
-      case SheetNameRangeNotation(s, r) => s"$s!${r.show}"
+      case SheetNameRangeNotation(s, r) => s"$s!$r"
     }
     val parser: Parser[A1Notation] =
       (takeWhile(_ != '!') <~ Atto.char('!'), Range.parser).mapN(SheetNameRangeNotation.apply) |
