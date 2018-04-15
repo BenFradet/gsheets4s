@@ -11,20 +11,14 @@ object ModelSpec extends Properties("model") {
   import Prop._
 
   implicit def arbRow: Arbitrary[Row] = arbitraryFromValidate
-  val nonEmptyUpperStrGen: Gen[String] =
-    Gen.nonEmptyListOf(Gen.choose('A', 'Z')).map(_.mkString)
-  implicit def arbCol: Arbitrary[Col] =
-    arbitraryFromValidate(implicitly, implicitly, Arbitrary(nonEmptyUpperStrGen))
-
-  property("ColPosition parser") = forAll { c: Col =>
-    Position.parser.parseOnly(c.toString).option == Some(ColPosition(c))
+  implicit def arbCol: Arbitrary[Col] = {
+    val gen: Gen[String] = Gen.nonEmptyListOf(Gen.choose('A', 'Z')).map(_.mkString)
+    arbitraryFromValidate(implicitly, implicitly, Arbitrary(gen))
   }
 
-  property("RowPosition parser") = forAll { (r: Row) =>
-    Position.parser.parseOnly(r.toString).option == Some(RowPosition(r))
-  }
-
-  property("ColRowPosition parser") = forAll { (c: Col, r: Row) =>
+  property("Position parser") = forAll { (c: Col, r: Row) =>
+    Position.parser.parseOnly(c.toString).option == Some(ColPosition(c)) &&
+    Position.parser.parseOnly(r.toString).option == Some(RowPosition(r)) &&
     Position.parser.parseOnly(c.toString + r.toString).option == Some(ColRowPosition(c, r))
   }
 }
