@@ -42,7 +42,8 @@ object model {
   final case class Range(start: Position, end: Position)
   object Range {
     implicit val showRange: Show[Range] = Show.show(r => s"${r.start}:${r.end}")
-    val parser: Parser[Range] = (Position.parser <~ Atto.char(':'), Position.parser).mapN(Range.apply)
+    val parser: Parser[Range] =
+      (Position.parser <~ Atto.char(':'), Position.parser).mapN(Range.apply)
   }
 
   sealed trait A1Notation
