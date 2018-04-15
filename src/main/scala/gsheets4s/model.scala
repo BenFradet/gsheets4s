@@ -46,21 +46,25 @@ object model {
       (Position.parser <~ Atto.char(':'), Position.parser).mapN(Range.apply)
   }
 
+  type ValidSheetName = NonEmpty
+  type SheetName = String Refined ValidSheetName
+
   sealed trait A1Notation
   object A1Notation {
     implicit val showA1Notation: Show[A1Notation] = Show.show {
-      case SheetNameNotation(s) => s
+      case SheetNameNotation(s) => s.toString
       case RangeNotation(r) => r.show
-      case SheetNameRangeNotation(s, r) => s"$s!$r"
+      case SheetNameRangeNotation(s, r) => s"$s!${r.show}"
     }
     val parser: Parser[A1Notation] =
-      (takeWhile(_ != '!') <~ Atto.char('!'), Range.parser).mapN(SheetNameRangeNotation.apply) |
-        Range.parser.map(RangeNotation(_): A1Notation) |
-        stringOf1(elem(_ => true)).map(SheetNameNotation(_): A1Notation)
+      (takeWhile(_ != '!').refined[ValidSheetName] <~ Atto.char('!'), Range.parser)
+        .mapN(SheetNameRangeNotation.apply) |
+          Range.parser.map(RangeNotation(_): A1Notation) |
+          stringOf1(elem(_ => true)).refined[ValidSheetName].map(SheetNameNotation(_): A1Notation)
   }
-  final case class SheetNameNotation(sheetName: String) extends A1Notation
+  final case class SheetNameNotation(sheetName: SheetName) extends A1Notation
   final case class RangeNotation(range: Range) extends A1Notation
-  final case class SheetNameRangeNotation(sheetName: String, range: Range) extends A1Notation
+  final case class SheetNameRangeNotation(sheetName: SheetName, range: Range) extends A1Notation
   implicit val a1NotationDecoder: Decoder[A1Notation] = Decoder.decodeString.flatMap { s =>
     new Decoder[A1Notation] {
       final def apply(c: HCursor): Decoder.Result[A1Notation] =
