@@ -12,12 +12,18 @@ object arbitraries {
     arbitraryFromValidate(implicitly, implicitly, Arbitrary(gen))
   }
 
-  implicit def arbPosition: Arbitrary[Position] = {
-    val gen: Gen[Position] = for {
+  implicit def arbPosition: Arbitrary[Position] = Arbitrary {
+    for {
       col <- arbCol.arbitrary
       row <- arbRow.arbitrary
       pos <- Gen.oneOf(ColPosition(col): Position, RowPosition(row), ColRowPosition(col, row))
     } yield pos
-    Arbitrary(gen)
+  }
+
+  implicit def arbRange: Arbitrary[Range] = Arbitrary {
+    for {
+      start <- arbPosition.arbitrary
+      end <- arbPosition.arbitrary
+    } yield Range(start, end)
   }
 }

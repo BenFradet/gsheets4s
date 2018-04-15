@@ -10,7 +10,11 @@ import model._
 object ModelSpec extends Properties("model") {
   import Prop._
 
-  property("Position parser") = forAll { (p: Position) =>
+  property("Position roundtrip") = forAll { (p: Position) =>
     Position.parser.parseOnly(p.show).option == Some(p)
+  }
+
+  property("Range roundtrip") = forAll { (r: Range) =>
+    Range.parser.parseOnly(r.show).option == Some(r)
   }
 }

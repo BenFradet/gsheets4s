@@ -41,7 +41,7 @@ object model {
 
   final case class Range(start: Position, end: Position)
   object Range {
-    implicit val showRange: Show[Range] = Show.show(r => s"${r.start}:${r.end}")
+    implicit val showRange: Show[Range] = Show.show(r => s"${r.start.show}:${r.end.show}")
     val parser: Parser[Range] =
       (Position.parser <~ Atto.char(':'), Position.parser).mapN(Range.apply)
   }
