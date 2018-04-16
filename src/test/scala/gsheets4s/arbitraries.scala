@@ -29,16 +29,17 @@ object arbitraries {
 
   implicit def arbSheetName: Arbitrary[SheetName] = arbitraryFromValidate
 
-  implicit def arbA1Notation: Arbitrary[A1Notation] =
-    Arbitrary {
-      for {
-        sheetName <- arbSheetName.arbitrary
-        range <- arbRange.arbitrary
-        notation <- Gen.oneOf(
-          SheetNameNotation(sheetName),
-          RangeNotation(range),
-          SheetNameRangeNotation(sheetName, range)
-        )
-      } yield notation
-    }
+  implicit def arbA1Notation: Arbitrary[A1Notation] = Arbitrary {
+    for {
+      sheetName <- arbSheetName.arbitrary
+      range <- arbRange.arbitrary
+      notation <- Gen.oneOf(
+        SheetNameNotation(sheetName),
+        RangeNotation(range),
+        SheetNameRangeNotation(sheetName, range)
+      )
+    } yield notation
+  }
+
+  implicit def arbDimension: Arbitrary[Dimension] = Arbitrary { Gen.oneOf(Rows, Columns) }
 }
