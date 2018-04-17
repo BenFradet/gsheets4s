@@ -1,6 +1,7 @@
-package gsheets4s.algebras
+package gsheets4s
+package algebras
 
-import gsheets4s.model._
+import model._
 
 trait SpreadsheetsValues[F[_]] {
   def get(spreadsheetID: String, range: A1Notation): F[ValueRange]

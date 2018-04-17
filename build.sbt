@@ -31,6 +31,7 @@ lazy val catsVersion = "1.1.0"
 lazy val circeVersion = "0.9.3"
 lazy val refinedVersion = "0.8.7"
 lazy val attoVersion = "0.6.2-M2"
+lazy val hammockVersion = "0.8.1"
 lazy val scalacheckVersion = "1.13.5"
 lazy val scalatestVersion = "3.0.5"
 
@@ -49,6 +50,9 @@ lazy val gsheets4s = project.in(file("."))
       "org.tpolecat" %% "atto-core",
       "org.tpolecat" %% "atto-refined"
     ).map(_ % attoVersion) ++ Seq(
+      "com.pepegar" %% "hammock-core",
+      "com.pepegar" %% "hammock-circe"
+    ).map(_ % hammockVersion) ++ Seq(
       "org.scalatest" %% "scalatest" % scalatestVersion,
       "org.scalacheck" %% "scalacheck" % scalacheckVersion,
       "eu.timepit" %% "refined-scalacheck" % refinedVersion
