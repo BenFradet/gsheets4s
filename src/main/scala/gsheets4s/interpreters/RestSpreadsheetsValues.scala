@@ -12,7 +12,7 @@ import hammock.circe.implicits._
 import algebras._
 import model._
 
-class RestSpreadsheetsValues(
+class RestSpreadsheetsValues private(
     accessToken: String)(implicit interpreter: Interpreter[IO]) extends SpreadsheetsValues[IO] {
 
   private val uri = (id: String, range: A1Notation) =>
@@ -31,4 +31,9 @@ class RestSpreadsheetsValues(
     .request(Method.PUT, uri"${uri(spreadsheetID, range)}", Map.empty, Some(updates))
     .as[UpdateValuesResponse]
     .exec[IO]
+}
+
+object RestSpreadsheetsValues {
+  def apply(accessToken: String)(implicit interpreter: Interpreter[IO]): RestSpreadsheetsValues =
+    new RestSpreadsheetsValues(accessToken)
 }
