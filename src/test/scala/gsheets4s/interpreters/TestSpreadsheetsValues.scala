@@ -9,7 +9,7 @@ import cats.instances.option._
 import algebras._
 import model._
 
-object InMemorySpreadsheetsValues extends SpreadsheetsValues[Id] {
+object TestSpreadsheetsValues extends SpreadsheetsValues[Id] {
   private var data: Map[String, List[List[String]]] = Map.empty
 
   def get(spreadsheetID: String, range: A1Notation): Id[ValueRange] = {

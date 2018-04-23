@@ -42,4 +42,12 @@ object arbitraries {
   }
 
   implicit def arbDimension: Arbitrary[Dimension] = Arbitrary { Gen.oneOf(Rows, Columns) }
+
+  implicit def arbValueRange: Arbitrary[ValueRange] = Arbitrary {
+    for {
+      notation <- arbA1Notation.arbitrary
+      dim <- arbDimension.arbitrary
+      values <- Gen.listOf(Gen.listOf(Gen.alphaStr))
+    } yield ValueRange(notation, dim, values)
+  }
 }
