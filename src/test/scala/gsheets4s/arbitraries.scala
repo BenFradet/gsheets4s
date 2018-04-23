@@ -6,11 +6,12 @@ import org.scalacheck.{Arbitrary, Gen}
 import model._
 
 object arbitraries {
+  private val nonEmptyUpperChars: Gen[String] =
+    Gen.nonEmptyListOf(Gen.choose('A', 'Z')).map(_.mkString)
+
   implicit def arbRow: Arbitrary[Row] = arbitraryFromValidate
-  implicit def arbCol: Arbitrary[Col] = {
-    val gen: Gen[String] = Gen.nonEmptyListOf(Gen.choose('A', 'Z')).map(_.mkString)
-    arbitraryFromValidate(implicitly, implicitly, Arbitrary(gen))
-  }
+  implicit def arbCol: Arbitrary[Col] =
+    arbitraryFromValidate(implicitly, implicitly, Arbitrary(nonEmptyUpperChars))
 
   implicit def arbPosition: Arbitrary[Position] = Arbitrary {
     for {
@@ -27,7 +28,8 @@ object arbitraries {
     } yield Range(start, end)
   }
 
-  implicit def arbSheetName: Arbitrary[SheetName] = arbitraryFromValidate
+  implicit def arbSheetName: Arbitrary[SheetName] =
+    arbitraryFromValidate(implicitly, implicitly, Arbitrary(nonEmptyUpperChars))
 
   implicit def arbA1Notation: Arbitrary[A1Notation] = Arbitrary {
     for {
@@ -47,7 +49,7 @@ object arbitraries {
     for {
       notation <- arbA1Notation.arbitrary
       dim <- arbDimension.arbitrary
-      values <- Gen.listOf(Gen.listOf(Gen.alphaStr))
+      values <- Gen.listOfN(10, Gen.listOfN(10, nonEmptyUpperChars))
     } yield ValueRange(notation, dim, values)
   }
 }
