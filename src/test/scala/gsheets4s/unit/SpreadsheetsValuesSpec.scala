@@ -7,7 +7,7 @@ import arbitraries._
 import interpreters._
 import model._
 
-object SpreadsheetsValuesSpec extends Properties("SpreadsheetsValues") {
+object SpreadsheetsValuesSpec extends Properties("SpreadsheetsValues unit") {
   property("update/get program") = Prop.forAll { (spreadsheetId: String, vr: ValueRange) =>
     val (uvr, vr2) = new TestPrograms(TestSpreadsheetsValues).updateAndGet(spreadsheetId, vr)
     uvr.spreadsheetId == spreadsheetId &&
