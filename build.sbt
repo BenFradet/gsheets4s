@@ -29,7 +29,7 @@ lazy val baseSettings = Seq(
 
 lazy val catsVersion = "1.1.0"
 lazy val circeVersion = "0.9.3"
-lazy val refinedVersion = "0.8.7"
+lazy val refinedVersion = "0.9.0"
 lazy val attoVersion = "0.6.2"
 lazy val hammockVersion = "0.8.1"
 lazy val scalacheckVersion = "1.13.5"
