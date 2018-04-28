@@ -84,6 +84,10 @@ object model {
   }
   implicit val dimensionEncoder: Encoder[Dimension] = Encoder.encodeString.contramap(_.value)
 
+  sealed abstract class ValueInputOption(val value: String)
+  case object Raw extends ValueInputOption("RAW")
+  case object UserEntered extends ValueInputOption("USER_ENTERED")
+
   final case class ValueRange(
     range: A1Notation,
     majorDimension: Dimension,

@@ -10,9 +10,13 @@ import model._
 class TestPrograms[F[_]: FlatMap](alg: SpreadsheetsValues[F]) {
   import alg._
 
-  def updateAndGet(spreadsheetId: String, vr: ValueRange): F[(UpdateValuesResponse, ValueRange)] =
+  def updateAndGet(
+    spreadsheetId: String,
+    vr: ValueRange,
+    vio: ValueInputOption
+  ): F[(UpdateValuesResponse, ValueRange)] =
     for {
-      updateValuesResponse <- update(spreadsheetId, vr.range, vr)
+      updateValuesResponse <- update(spreadsheetId, vr.range, vr, vio)
       valueRange <- get(spreadsheetId, vr.range)
     } yield (updateValuesResponse, valueRange)
 }

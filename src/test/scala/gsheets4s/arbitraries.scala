@@ -45,6 +45,9 @@ object arbitraries {
 
   implicit def arbDimension: Arbitrary[Dimension] = Arbitrary { Gen.oneOf(Rows, Columns) }
 
+  implicit def arbValueInputOption: Arbitrary[ValueInputOption] =
+    Arbitrary { Gen.oneOf(Raw, UserEntered) }
+
   implicit def arbValueRange: Arbitrary[ValueRange] = Arbitrary {
     for {
       notation <- arbA1Notation.arbitrary

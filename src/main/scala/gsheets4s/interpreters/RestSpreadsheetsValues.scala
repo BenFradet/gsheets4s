@@ -3,6 +3,7 @@ package interpreters
 
 import cats.effect.IO
 import cats.syntax.show._
+import cats.syntax.option._
 import io.circe.generic.auto._
 import hammock._
 import hammock.marshalling._
@@ -16,19 +17,22 @@ class RestSpreadsheetsValues private(
     accessToken: String)(implicit interpreter: Interpreter[IO]) extends SpreadsheetsValues[IO] {
 
   private val uri = (id: String, range: A1Notation) =>
-    s"https://sheets.googleapis.com/v4/spreadsheets/$id/values/${range.show}"
+    (Uri("https".some, none, "sheets.googleapis.com/v4/spreadsheets") /
+      id / "values" / range.show).param("access_token", accessToken)
 
   def get(spreadsheetID: String, range: A1Notation): IO[ValueRange] = Hammock
-    .request(Method.GET, uri"${uri(spreadsheetID, range)}", Map.empty)
+    .request(Method.GET, uri(spreadsheetID, range), Map.empty)
     .as[ValueRange]
     .exec[IO]
 
   def update(
     spreadsheetID: String,
     range: A1Notation,
-    updates: ValueRange
+    updates: ValueRange,
+    valueInputOption: ValueInputOption
   ): IO[UpdateValuesResponse] = Hammock
-    .request(Method.PUT, uri"${uri(spreadsheetID, range)}", Map.empty, Some(updates))
+    .request(Method.PUT, uri(spreadsheetID, range).param("valueInputOption", valueInputOption.value),
+      Map.empty, Some(updates))
     .as[UpdateValuesResponse]
     .exec[IO]
 }

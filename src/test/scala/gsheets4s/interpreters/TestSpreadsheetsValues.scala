@@ -20,7 +20,8 @@ object TestSpreadsheetsValues extends SpreadsheetsValues[Id] {
   def update(
     spreadsheetID: String,
     range: A1Notation,
-    updates: ValueRange
+    updates: ValueRange,
+    valueInputOption: ValueInputOption
   ): Id[UpdateValuesResponse] = {
     data = data + (spreadsheetID -> updates.values)
     val numRows = updates.values.size
