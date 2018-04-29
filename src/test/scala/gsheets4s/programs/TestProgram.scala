@@ -1,22 +1,21 @@
 package gsheets4s
 
-import cats.FlatMap
-import cats.syntax.flatMap._
-import cats.syntax.functor._
+import cats.Monad
+import cats.data.EitherT
 
 import algebras._
 import model._
 
-class TestPrograms[F[_]: FlatMap](alg: SpreadsheetsValues[F]) {
+class TestPrograms[F[_]: Monad](alg: SpreadsheetsValues[F]) {
   import alg._
 
   def updateAndGet(
     spreadsheetId: String,
     vr: ValueRange,
     vio: ValueInputOption
-  ): F[(UpdateValuesResponse, ValueRange)] =
-    for {
-      updateValuesResponse <- update(spreadsheetId, vr.range, vr, vio)
-      valueRange <- get(spreadsheetId, vr.range)
-    } yield (updateValuesResponse, valueRange)
+  ): F[Either[Error, (UpdateValuesResponse, ValueRange)]] =
+    (for {
+      updateValuesResponse <- EitherT(update(spreadsheetId, vr.range, vr, vio))
+      valueRange <- EitherT(get(spreadsheetId, vr.range))
+    } yield (updateValuesResponse, valueRange)).value
 }

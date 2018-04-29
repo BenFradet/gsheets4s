@@ -20,9 +20,9 @@ class RestSpreadsheetsValues private(
     (Uri("https".some, none, "sheets.googleapis.com/v4/spreadsheets") /
       id / "values" / range.show).param("access_token", accessToken)
 
-  def get(spreadsheetID: String, range: A1Notation): IO[ValueRange] = Hammock
+  def get(spreadsheetID: String, range: A1Notation): IO[Either[Error, ValueRange]] = Hammock
     .request(Method.GET, uri(spreadsheetID, range), Map.empty)
-    .as[ValueRange]
+    .as[Either[Error, ValueRange]]
     .exec[IO]
 
   def update(
@@ -30,10 +30,10 @@ class RestSpreadsheetsValues private(
     range: A1Notation,
     updates: ValueRange,
     valueInputOption: ValueInputOption
-  ): IO[UpdateValuesResponse] = Hammock
+  ): IO[Either[Error, UpdateValuesResponse]] = Hammock
     .request(Method.PUT, uri(spreadsheetID, range).param("valueInputOption", valueInputOption.value),
       Map.empty, Some(updates))
-    .as[UpdateValuesResponse]
+    .as[Either[Error, UpdateValuesResponse]]
     .exec[IO]
 }
 

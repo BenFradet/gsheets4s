@@ -30,9 +30,11 @@ class SpreadsheetsValuesSpec extends FlatSpec {
       Range(ColRowPosition("A", 1), ColRowPosition("B", 2)))
     val vr = ValueRange(not, Rows, List(List("1", "2"), List("3", "4")))
     val vio = UserEntered
-    val (uvr, vr2) =
+    val res =
       new TestPrograms(RestSpreadsheetsValues(token.get)).updateAndGet(spreadsheetID, vr, vio)
         .unsafeRunSync()
+    assert(res.isRight)
+    val Right((uvr, vr2)) = res
     assert(uvr.spreadsheetId == spreadsheetID)
     assert(uvr.updatedRange == vr.range)
     assert(vr.range == vr2.range)
