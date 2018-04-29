@@ -13,6 +13,7 @@ import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
 import io.circe.{Decoder, DecodingFailure, Encoder, HCursor}
+import io.circe.generic.semiauto._
 
 object model {
   type ValidCol = NonEmpty And Forall[UpperCase]
@@ -101,4 +102,11 @@ object model {
     updatedColumns: Int,
     updatedCells: Int
   )
+
+  final case class Error(
+    code: Int,
+    message: String,
+    status: String
+  )
+  implicit val errorDecoder: Decoder[Error] = deriveDecoder[Error].prepare(_.downField("error"))
 }

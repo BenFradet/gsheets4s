@@ -2,6 +2,8 @@ package gsheets4s
 
 import atto.Atto._
 import cats.syntax.show._
+import io.circe.Json
+import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
 import org.scalacheck._
@@ -25,10 +27,14 @@ object ModelSpec extends Properties("model") {
   }
 
   property("A1Notation encode/decoder") = forAll { n: A1Notation =>
-    decode[A1Notation](n.asJson.noSpaces).isRight
+    decode[A1Notation](n.asJson.noSpaces) == Right(n)
   }
 
   property("Dimension encoder/decoder") = forAll { d: Dimension =>
-    decode[Dimension](d.asJson.noSpaces).isRight
+    decode[Dimension](d.asJson.noSpaces) == Right(d)
+  }
+
+  property("Error decoder") = forAll { e: Error =>
+    decode[Error](Json.obj(("error", e.asJson)).noSpaces) == Right(e)
   }
 }

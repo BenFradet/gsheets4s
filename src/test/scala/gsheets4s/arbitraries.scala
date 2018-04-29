@@ -55,4 +55,12 @@ object arbitraries {
       values <- Gen.listOfN(10, Gen.listOfN(10, nonEmptyUpperChars))
     } yield ValueRange(notation, dim, values)
   }
+
+  implicit def arbError: Arbitrary[Error] = Arbitrary {
+    for {
+      code <- Gen.choose(1, 500)
+      msg <- Gen.alphaStr
+      status <- Gen.alphaStr
+    } yield Error(code, msg, status)
+  }
 }
