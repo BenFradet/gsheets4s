@@ -20,20 +20,30 @@ class RestSpreadsheetsValues private(
     (Uri("https".some, none, "sheets.googleapis.com/v4/spreadsheets") /
       id / "values" / range.show).param("access_token", accessToken)
 
-  def get(spreadsheetID: String, range: A1Notation): IO[Either[Error, ValueRange]] = Hammock
-    .request(Method.GET, uri(spreadsheetID, range), Map.empty)
-    .as[Either[Error, ValueRange]]
-    .exec[IO]
+  def get(spreadsheetID: String, range: A1Notation): IO[Either[Error, ValueRange]] =
+    get[Either[Error, ValueRange]](uri(spreadsheetID, range))
 
   def update(
     spreadsheetID: String,
     range: A1Notation,
     updates: ValueRange,
     valueInputOption: ValueInputOption
-  ): IO[Either[Error, UpdateValuesResponse]] = Hammock
-    .request(Method.PUT, uri(spreadsheetID, range).param("valueInputOption", valueInputOption.value),
-      Map.empty, Some(updates))
-    .as[Either[Error, UpdateValuesResponse]]
+  ): IO[Either[Error, UpdateValuesResponse]] = {
+    val u = uri(spreadsheetID, range).param("valueInputOption", valueInputOption.value)
+    put[ValueRange, Either[Error, UpdateValuesResponse]](u, updates)
+  }
+
+  private def get[O](uri: Uri)(implicit d: Decoder[O]): IO[O] = Hammock
+    .request(Method.GET, uri, Map.empty)
+    .as[O]
+    .exec[IO]
+
+  private def put[I, O](
+    uri: Uri,
+    body: I
+  )(implicit c: Codec[I], d: Decoder[O]): IO[O] = Hammock
+    .request(Method.PUT, uri, Map.empty, Some(body))
+    .as[O]
     .exec[IO]
 }
 

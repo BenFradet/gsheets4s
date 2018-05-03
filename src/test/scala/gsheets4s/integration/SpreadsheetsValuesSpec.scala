@@ -2,10 +2,7 @@ package gsheets4s
 package integration
 
 import cats.effect.IO
-import cats.syntax.option._
-import cats.syntax.show._
 import eu.timepit.refined.auto._
-import hammock._
 import hammock.jvm.Interpreter
 import org.scalatest._
 
