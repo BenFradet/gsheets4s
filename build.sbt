@@ -32,6 +32,7 @@ lazy val circeVersion = "0.9.3"
 lazy val refinedVersion = "0.9.0"
 lazy val attoVersion = "0.6.2"
 lazy val hammockVersion = "0.8.3"
+lazy val fs2Version = "0.10.4"
 lazy val scalacheckVersion = "1.13.5"
 lazy val scalatestVersion = "3.0.5"
 
@@ -41,7 +42,8 @@ lazy val gsheets4s = project.in(file("."))
   .settings(
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % catsVersion,
-      "eu.timepit" %% "refined" % refinedVersion
+      "eu.timepit" %% "refined" % refinedVersion,
+      "co.fs2" %% "fs2-core" % fs2Version
     ) ++ Seq(
       "io.circe" %% "circe-core",
       "io.circe" %% "circe-generic",
