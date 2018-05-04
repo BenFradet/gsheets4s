@@ -63,4 +63,15 @@ object arbitraries {
       status <- Gen.alphaStr
     } yield Error(code, msg, status)
   }
+
+  implicit def either[A, B](
+    implicit a: Arbitrary[A], b: Arbitrary[B], bool: Arbitrary[Boolean]): Arbitrary[Either[A, B]] =
+    Arbitrary {
+      for {
+        aA <- a.arbitrary
+        aB <- b.arbitrary
+        bo <- bool.arbitrary
+        e = if (bo) Left(aA) else Right(aB)
+      } yield e
+    }
 }

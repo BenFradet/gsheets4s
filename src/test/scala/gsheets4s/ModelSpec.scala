@@ -37,4 +37,12 @@ object ModelSpec extends Properties("model") {
   property("Error decoder") = forAll { e: Error =>
     decode[Error](Json.obj(("error", e.asJson)).noSpaces) == Right(e)
   }
+
+  property("Either decoder") = forAll { e: Either[Error, ValueRange] =>
+    e match {
+      case Left(l) =>
+        decode[Either[Error, ValueRange]](Json.obj(("error", l.asJson)).noSpaces) == Right(e)
+      case Right(r) => decode[Either[Error, ValueRange]](r.asJson.noSpaces) == Right(e)
+    }
+  }
 }
