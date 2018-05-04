@@ -47,12 +47,20 @@ class RestSpreadsheetsValues private(
     .as[O]
     .exec[IO]
 
-  private def requestWithToken[A](uriBuilder: String => Uri, ioBuilder: Uri => IO[A]): IO[A] = for {
+  private def requestWithToken[A](
+    uriBuilder: String => Uri,
+    ioBuilder: Uri => IO[Either[Error, A]]
+  )(implicit d: Decoder[A]): IO[Either[Error, A]] = for {
     ref <- accessTokenRef
     token <- ref.get
-    uri = uriBuilder(token)
-    io <- ioBuilder(uri)
-  } yield io
+    builder = ioBuilder compose uriBuilder
+    io = builder(token)
+    either <- io
+    retried <- either match {
+      case Left(Error(401, _, _)) => retryWithNewToken(io)
+      case o => IO.pure(o)
+    }
+  } yield retried
 
   // get new token
   // set new token
