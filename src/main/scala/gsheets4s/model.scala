@@ -110,6 +110,13 @@ object model {
   )
   implicit val errorDecoder: Decoder[Error] = deriveDecoder[Error].prepare(_.downField("error"))
 
+  final case class Credentials(
+    accessToken: String,
+    refreshToken: String,
+    clientId: String,
+    clientSecret: String
+  )
+
   implicit def eitherDecoder[L, R](implicit l: Decoder[L], r: Decoder[R]): Decoder[Either[L, R]] =
     r.map(Right(_): Either[L, R]).or(l.map(Left(_): Either[L, R]))
 }
