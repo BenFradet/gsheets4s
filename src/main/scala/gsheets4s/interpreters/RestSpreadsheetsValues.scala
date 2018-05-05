@@ -1,9 +1,10 @@
 package gsheets4s
 package interpreters
 
+import cats.data.NonEmptyList
 import cats.effect.IO
-import cats.syntax.show._
 import cats.syntax.option._
+import cats.syntax.show._
 import fs2.async.Ref
 import hammock._
 import hammock.marshalling._
@@ -15,16 +16,16 @@ import algebras._
 import model._
 
 class RestSpreadsheetsValues private(
-    accessToken: String)(implicit interpreter: Interpreter[IO]) extends SpreadsheetsValues[IO] {
+    creds: Credentials)(implicit interpreter: Interpreter[IO]) extends SpreadsheetsValues[IO] {
 
-  private val accessTokenRef: IO[Ref[IO, String]] = Ref(accessToken)
+  private val accessTokenRef: IO[Ref[IO, String]] = Ref(creds.accessToken)
 
   private val uri = (id: String, range: A1Notation) => (accessToken: String) =>
     (Uri("https".some, none, "sheets.googleapis.com/v4/spreadsheets") /
       id / "values" / range.show).param("access_token", accessToken)
 
   def get(spreadsheetID: String, range: A1Notation): IO[Either[Error, ValueRange]] =
-    requestWithToken(uri(spreadsheetID, range), get[Either[Error, ValueRange]](_))
+    requestWithToken(uri(spreadsheetID, range), request[Either[Error, ValueRange]](Method.GET, _))
 
   def update(
     spreadsheetID: String,
@@ -34,18 +35,16 @@ class RestSpreadsheetsValues private(
   ): IO[Either[Error, UpdateValuesResponse]] = {
     val u = uri(spreadsheetID, range)
       .andThen(_.param("valueInputOption", valueInputOption.value))
-    requestWithToken(u, put[ValueRange, Either[Error, UpdateValuesResponse]](_, updates))
+    requestWithToken(u,
+      requestWithBody[ValueRange, Either[Error, UpdateValuesResponse]](Method.PUT, _, updates))
   }
 
-  private def get[O](uri: Uri)(implicit d: Decoder[O]): IO[O] = Hammock
-    .request(Method.GET, uri, Map.empty)
-    .as[O]
-    .exec[IO]
+  private def request[O](m: Method, uri: Uri)(implicit d: Decoder[O]): IO[O] =
+    Hammock.request(m, uri, Map.empty).as[O].exec[IO]
 
-  private def put[I, O](uri: Uri, body: I)(implicit c: Codec[I], d: Decoder[O]): IO[O] = Hammock
-    .request(Method.PUT, uri, Map.empty, Some(body))
-    .as[O]
-    .exec[IO]
+  private def requestWithBody[I, O](m: Method, uri: Uri, body: I)(
+      implicit c: Codec[I], d: Decoder[O]): IO[O] =
+    Hammock.request(m, uri, Map.empty, Some(body)).as[O].exec[IO]
 
   private def requestWithToken[A](
     uriBuilder: String => Uri,
@@ -54,26 +53,36 @@ class RestSpreadsheetsValues private(
     ref <- accessTokenRef
     token <- ref.get
     builder = ioBuilder compose uriBuilder
-    io = builder(token)
-    either <- io
+    either <- builder(token)
     retried <- either match {
-      case Left(Error(401, _, _)) => retryWithNewToken(io)
+      case Left(Error(401, _, _)) => retryWithNewToken(builder)
       case o => IO.pure(o)
     }
   } yield retried
 
-  // get new token
-  // set new token
-  // rerun
   private def retryWithNewToken[A](
-      io: IO[Either[Error, A]])(implicit d: Decoder[A]): IO[Either[Error, A]] = for {
-        ref <- accessTokenRef
-        _ <- ref.setSync("abcdef")
-        r <- io
+      builder: String => IO[Either[Error, A]])(implicit d: Decoder[A]): IO[Either[Error, A]] =
+    for {
+      ref <- accessTokenRef
+      newToken <- request[AccessToken](Method.POST, buildRefreshTokenUri(creds))
+      _ <- ref.setAsync(newToken.access_token)
+      r <- builder(newToken.access_token)
     } yield r
+
+  private def buildRefreshTokenUri(creds: Credentials): Uri =
+    Uri("https".some, none, "www.googleapis.com/oauth2/v4/token") ?
+      NonEmptyList(
+        ("refresh_token" -> creds.refreshToken),
+        List(
+          ("client_id" -> creds.clientId),
+          ("client_secret" -> creds.clientSecret),
+          ("grant_type" -> "refresh_token")
+        )
+      )
+
 }
 
 object RestSpreadsheetsValues {
-  def apply(accessToken: String)(implicit interpreter: Interpreter[IO]): RestSpreadsheetsValues =
-    new RestSpreadsheetsValues(accessToken)
+  def apply(creds: Credentials)(implicit interpreter: Interpreter[IO]): RestSpreadsheetsValues =
+    new RestSpreadsheetsValues(creds)
 }

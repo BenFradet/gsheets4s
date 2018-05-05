@@ -11,8 +11,13 @@ import model._
 
 class SpreadsheetsValuesSpec extends FlatSpec {
 
-  val token = sys.env.get("GSHEETS4S_ACCESS_TOKEN")
-  assume(token.isDefined)
+  val creds = for {
+    accessToken <- sys.env.get("GSHEETS4S_ACCESS_TOKEN")
+    refreshToken <- sys.env.get("GSHEETS4S_REFRESH_TOKEN")
+    clientId <- sys.env.get("GSHEETS4S_CLIENT_ID")
+    clientSecret <- sys.env.get("GSHEETS4S_CLIENT_SECRET")
+  } yield Credentials(accessToken, refreshToken, clientId, clientSecret)
+  assume(creds.isDefined)
 
   val spreadsheetID = "1tk2S_A4LZfeZjoMskbfFXO42_b75A7UkSdhKaQZlDmA"
   val not = SheetNameRangeNotation("Sheet1",
@@ -23,7 +28,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   implicit val interpreter = Interpreter[IO]
 
   "RestSpreadsheetsValues" should "update and get values" in {
-    val res = new TestPrograms(RestSpreadsheetsValues(token.get))
+    val res = new TestPrograms(RestSpreadsheetsValues(creds.get))
       .updateAndGet(spreadsheetID, vr, vio)
       .unsafeRunSync()
     assert(res.isRight)
@@ -35,7 +40,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   }
 
   it should "report an error if the spreadsheet it doesn't exist" in {
-    val res = new TestPrograms(RestSpreadsheetsValues(token.get))
+    val res = new TestPrograms(RestSpreadsheetsValues(creds.get))
       .updateAndGet("not-existing-spreadsheetid", vr, vio)
       .unsafeRunSync()
     assert(res.isLeft)
