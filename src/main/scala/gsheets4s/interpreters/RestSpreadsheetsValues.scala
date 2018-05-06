@@ -3,6 +3,7 @@ package interpreters
 
 import cats.data.NonEmptyList
 import cats.effect.IO
+import cats.syntax.either._
 import cats.syntax.option._
 import cats.syntax.show._
 import fs2.async.Ref
@@ -35,10 +36,23 @@ class RestSpreadsheetsValues private(
         )
       )
 
-  def get(spreadsheetID: String, range: A1Notation): IO[Either[Error, ValueRange]] =
+  private val accessTokenDecoder = new Decoder[String] {
+    override def decode(entity: Entity): Either[CodecException, String] = entity match {
+      case Entity.StringEntity(str, _) =>
+        val decoder = io.circe.Decoder.decodeString.prepare(_.downField("access_token"))
+        io.circe.parser.decode(str)(decoder)
+          .leftMap(err => CodecException.withMessageAndException(err.getMessage, err))
+      case _: Entity.ByteArrayEntity => CodecException
+        .withMessage("unable to decode a ByteArrayEntity. Only StringEntity is supported").asLeft
+      case Entity.EmptyEntity => CodecException
+        .withMessage("unable to decode an EmptyEntity. Only StringEntity is supported").asLeft
+    }
+  }
+
+  override def get(spreadsheetID: String, range: A1Notation): IO[Either[Error, ValueRange]] =
     requestWithToken(uri(spreadsheetID, range), request[Either[Error, ValueRange]](Method.GET, _))
 
-  def update(
+  override def update(
     spreadsheetID: String,
     range: A1Notation,
     updates: ValueRange,
@@ -75,9 +89,9 @@ class RestSpreadsheetsValues private(
       builder: String => IO[Either[Error, A]])(implicit d: Decoder[A]): IO[Either[Error, A]] =
     for {
       ref <- accessTokenRef
-      newToken <- request[AccessToken](Method.POST, refreshTokenUri(creds))
-      _ <- ref.setAsync(newToken.access_token)
-      r <- builder(newToken.access_token)
+      newToken <- request[String](Method.POST, refreshTokenUri(creds))(accessTokenDecoder)
+      _ <- ref.setAsync(newToken)
+      r <- builder(newToken)
     } yield r
 
 }

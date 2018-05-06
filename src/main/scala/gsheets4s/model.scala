@@ -117,8 +117,6 @@ object model {
     clientId: String,
     clientSecret: String
   )
-  // replace with custom decoder
-  private[gsheets4s] final case class AccessToken(access_token: String)
 
   implicit def eitherDecoder[L, R](implicit l: Decoder[L], r: Decoder[R]): Decoder[Either[L, R]] =
     r.map(Right(_): Either[L, R]).or(l.map(Left(_): Either[L, R]))
