@@ -24,6 +24,17 @@ class RestSpreadsheetsValues private(
     (Uri("https".some, none, "sheets.googleapis.com/v4/spreadsheets") /
       id / "values" / range.show).param("access_token", accessToken)
 
+  private val refreshTokenUri = (creds: Credentials) =>
+    Uri("https".some, none, "www.googleapis.com/oauth2/v4/token") ?
+      NonEmptyList(
+        ("refresh_token" -> creds.refreshToken),
+        List(
+          ("client_id" -> creds.clientId),
+          ("client_secret" -> creds.clientSecret),
+          ("grant_type" -> "refresh_token")
+        )
+      )
+
   def get(spreadsheetID: String, range: A1Notation): IO[Either[Error, ValueRange]] =
     requestWithToken(uri(spreadsheetID, range), request[Either[Error, ValueRange]](Method.GET, _))
 
@@ -55,30 +66,19 @@ class RestSpreadsheetsValues private(
     builder = ioBuilder compose uriBuilder
     either <- builder(token)
     retried <- either match {
-      case Left(Error(401, _, _)) => retryWithNewToken(builder)
+      case Left(Error(401, _, _)) => requestWithNewToken(builder)
       case o => IO.pure(o)
     }
   } yield retried
 
-  private def retryWithNewToken[A](
+  private def requestWithNewToken[A](
       builder: String => IO[Either[Error, A]])(implicit d: Decoder[A]): IO[Either[Error, A]] =
     for {
       ref <- accessTokenRef
-      newToken <- request[AccessToken](Method.POST, buildRefreshTokenUri(creds))
+      newToken <- request[AccessToken](Method.POST, refreshTokenUri(creds))
       _ <- ref.setAsync(newToken.access_token)
       r <- builder(newToken.access_token)
     } yield r
-
-  private def buildRefreshTokenUri(creds: Credentials): Uri =
-    Uri("https".some, none, "www.googleapis.com/oauth2/v4/token") ?
-      NonEmptyList(
-        ("refresh_token" -> creds.refreshToken),
-        List(
-          ("client_id" -> creds.clientId),
-          ("client_secret" -> creds.clientSecret),
-          ("grant_type" -> "refresh_token")
-        )
-      )
 
 }
 
