@@ -3,6 +3,7 @@ package integration
 
 import cats.effect.IO
 import eu.timepit.refined.auto._
+import fs2.async
 import hammock.jvm.Interpreter
 import org.scalatest._
 
@@ -28,9 +29,11 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   implicit val interpreter = Interpreter[IO]
 
   "RestSpreadsheetsValues" should "update and get values" in {
-    val res = new TestPrograms(RestSpreadsheetsValues(creds.get))
-      .updateAndGet(spreadsheetID, vr, vio)
-      .unsafeRunSync()
+    val res = (for {
+      ref <- async.refOf[IO, String](creds.get.accessToken)
+      prog <- new TestPrograms(RestSpreadsheetsValues(creds.get, ref))
+        .updateAndGet(spreadsheetID, vr, vio)
+    } yield prog).unsafeRunSync()
     assert(res.isRight)
     val Right((uvr, vr2)) = res
     assert(uvr.spreadsheetId == spreadsheetID)
@@ -40,13 +43,29 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   }
 
   it should "report an error if the spreadsheet it doesn't exist" in {
-    val res = new TestPrograms(RestSpreadsheetsValues(creds.get))
-      .updateAndGet("not-existing-spreadsheetid", vr, vio)
-      .unsafeRunSync()
+    val res = (for {
+      ref <- async.refOf[IO, String](creds.get.accessToken)
+      prog <- new TestPrograms(RestSpreadsheetsValues(creds.get, ref))
+        .updateAndGet("not-existing-spreadsheetid", vr, vio)
+    } yield prog).unsafeRunSync()
     assert(res.isLeft)
     val Left(err) = res
     assert(err.code == 404)
     assert(err.message == "Requested entity was not found.")
     assert(err.status == "NOT_FOUND")
+  }
+
+  it should "work with a faulty access token" in {
+    val res = (for {
+      ref <- async.refOf[IO, String]("faulty")
+      prog <- new TestPrograms(RestSpreadsheetsValues(creds.get.copy(accessToken = "faulty"), ref))
+        .updateAndGet(spreadsheetID, vr, vio)
+    } yield prog).unsafeRunSync()
+    assert(res.isRight)
+    val Right((uvr, vr2)) = res
+    assert(uvr.spreadsheetId == spreadsheetID)
+    assert(uvr.updatedRange == vr.range)
+    assert(vr.range == vr2.range)
+    assert(vr.values == vr2.values)
   }
 }

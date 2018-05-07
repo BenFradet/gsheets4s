@@ -17,9 +17,8 @@ import algebras._
 import model._
 
 class RestSpreadsheetsValues private(
-    creds: Credentials)(implicit interpreter: Interpreter[IO]) extends SpreadsheetsValues[IO] {
-
-  private val accessTokenRef: IO[Ref[IO, String]] = Ref(creds.accessToken)
+    creds: Credentials, accessTokenRef: Ref[IO, String])(implicit interpreter: Interpreter[IO])
+      extends SpreadsheetsValues[IO] {
 
   private val uri = (id: String, range: A1Notation) => (accessToken: String) =>
     (Uri("https".some, none, "sheets.googleapis.com/v4/spreadsheets") /
@@ -75,8 +74,7 @@ class RestSpreadsheetsValues private(
     uriBuilder: String => Uri,
     ioBuilder: Uri => IO[Either[Error, A]]
   )(implicit d: Decoder[A]): IO[Either[Error, A]] = for {
-    ref <- accessTokenRef
-    token <- ref.get
+    token <- accessTokenRef.get
     builder = ioBuilder compose uriBuilder
     either <- builder(token)
     retried <- either match {
@@ -88,15 +86,15 @@ class RestSpreadsheetsValues private(
   private def requestWithNewToken[A](
       builder: String => IO[Either[Error, A]])(implicit d: Decoder[A]): IO[Either[Error, A]] =
     for {
-      ref <- accessTokenRef
       newToken <- request[String](Method.POST, refreshTokenUri(creds))(accessTokenDecoder)
-      _ <- ref.setAsync(newToken)
+      _ <- accessTokenRef.setAsync(newToken)
       r <- builder(newToken)
     } yield r
 
 }
 
 object RestSpreadsheetsValues {
-  def apply(creds: Credentials)(implicit interpreter: Interpreter[IO]): RestSpreadsheetsValues =
-    new RestSpreadsheetsValues(creds)
+  def apply(creds: Credentials, accessTokenRef: Ref[IO, String])(
+      implicit interpreter: Interpreter[IO]): RestSpreadsheetsValues =
+    new RestSpreadsheetsValues(creds, accessTokenRef)
 }
