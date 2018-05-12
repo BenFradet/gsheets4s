@@ -17,7 +17,7 @@ import algebras._
 import model._
 
 class RestSpreadsheetsValues private(
-    creds: Credentials, accessTokenRef: Ref[IO, String])(implicit interpreter: Interpreter[IO])
+    creds: Ref[IO, Credentials])(implicit interpreter: Interpreter[IO])
       extends SpreadsheetsValues[IO] {
 
   private val uri = (id: String, range: A1Notation) => (accessToken: String) =>
@@ -74,9 +74,9 @@ class RestSpreadsheetsValues private(
     uriBuilder: String => Uri,
     ioBuilder: Uri => IO[Either[Error, A]]
   )(implicit d: Decoder[A]): IO[Either[Error, A]] = for {
-    token <- accessTokenRef.get
+    creds <- creds.get
     builder = ioBuilder compose uriBuilder
-    either <- builder(token)
+    either <- builder(creds.accessToken)
     retried <- either match {
       case Left(Error(401, _, _)) => requestWithNewToken(builder)
       case o => IO.pure(o)
@@ -86,15 +86,16 @@ class RestSpreadsheetsValues private(
   private def requestWithNewToken[A](
       builder: String => IO[Either[Error, A]])(implicit d: Decoder[A]): IO[Either[Error, A]] =
     for {
-      newToken <- request[String](Method.POST, refreshTokenUri(creds))(accessTokenDecoder)
-      _ <- accessTokenRef.setAsync(newToken)
-      r <- builder(newToken)
+      c <- creds.get
+      newAccessToken <- request[String](Method.POST, refreshTokenUri(c))(accessTokenDecoder)
+      _ <- creds.setAsync(c.copy(accessToken = newAccessToken))
+      r <- builder(newAccessToken)
     } yield r
 
 }
 
 object RestSpreadsheetsValues {
-  def apply(creds: Credentials, accessTokenRef: Ref[IO, String])(
+  def apply(creds: Ref[IO, Credentials])(
       implicit interpreter: Interpreter[IO]): RestSpreadsheetsValues =
-    new RestSpreadsheetsValues(creds, accessTokenRef)
+    new RestSpreadsheetsValues(creds)
 }

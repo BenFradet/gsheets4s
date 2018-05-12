@@ -30,8 +30,8 @@ class SpreadsheetsValuesSpec extends FlatSpec {
 
   "RestSpreadsheetsValues" should "update and get values" in {
     val res = (for {
-      ref <- async.refOf[IO, String](creds.get.accessToken)
-      prog <- new TestPrograms(RestSpreadsheetsValues(creds.get, ref))
+      ref <- async.refOf[IO, Credentials](creds.get)
+      prog <- new TestPrograms(RestSpreadsheetsValues(ref))
         .updateAndGet(spreadsheetID, vr, vio)
     } yield prog).unsafeRunSync()
     assert(res.isRight)
@@ -44,8 +44,8 @@ class SpreadsheetsValuesSpec extends FlatSpec {
 
   it should "report an error if the spreadsheet it doesn't exist" in {
     val res = (for {
-      ref <- async.refOf[IO, String](creds.get.accessToken)
-      prog <- new TestPrograms(RestSpreadsheetsValues(creds.get, ref))
+      ref <- async.refOf[IO, Credentials](creds.get)
+      prog <- new TestPrograms(RestSpreadsheetsValues(ref))
         .updateAndGet("not-existing-spreadsheetid", vr, vio)
     } yield prog).unsafeRunSync()
     assert(res.isLeft)
@@ -57,8 +57,8 @@ class SpreadsheetsValuesSpec extends FlatSpec {
 
   it should "work with a faulty access token" in {
     val res = (for {
-      ref <- async.refOf[IO, String]("faulty")
-      prog <- new TestPrograms(RestSpreadsheetsValues(creds.get.copy(accessToken = "faulty"), ref))
+      ref <- async.refOf[IO, Credentials](creds.get.copy(accessToken = "faulty"))
+      prog <- new TestPrograms(RestSpreadsheetsValues(ref))
         .updateAndGet(spreadsheetID, vr, vio)
     } yield prog).unsafeRunSync()
     assert(res.isRight)
