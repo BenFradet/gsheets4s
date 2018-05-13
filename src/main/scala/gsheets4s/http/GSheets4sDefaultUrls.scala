@@ -1,4 +1,4 @@
-package gsheets4s
+package gsheets4s.http
 
 import cats.syntax.option._
 import hammock.Uri
