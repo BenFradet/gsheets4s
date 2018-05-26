@@ -28,12 +28,9 @@ object arbitraries {
     } yield Range(start, end)
   }
 
-  implicit def arbSheetName: Arbitrary[SheetName] =
-    arbitraryFromValidate(implicitly, implicitly, Arbitrary(nonEmptyUpperChars))
-
   implicit def arbA1Notation: Arbitrary[A1Notation] = Arbitrary {
     for {
-      sheetName <- arbSheetName.arbitrary
+      sheetName <- nonEmptyUpperChars
       range <- arbRange.arbitrary
       notation <- Gen.oneOf(
         SheetNameNotation(sheetName),
