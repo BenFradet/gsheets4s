@@ -1,8 +1,11 @@
 package gsheets4s
 package http
 
+import cats.~>
 import cats.data.NonEmptyList
+import cats.effect.Sync
 import hammock._
+import hammock.circe._
 import io.circe.{Encoder, Decoder}
 
 import model.Credentials
@@ -11,6 +14,20 @@ trait HttpRequester[F[_]] {
   def request[O](uri: Uri, method: Method)(implicit d: Decoder[O]): F[O]
   def requestWithBody[I, O](
     uri: Uri, body: I, method: Method)(implicit e: Encoder[I], d: Decoder[O]): F[O]
+}
+
+class HammockRequester[F[_]: Sync](implicit nat: HammockF ~> F) extends HttpRequester[F] {
+  def request[O](uri: Uri, method: Method)(implicit d: Decoder[O]): F[O] = {
+    implicit val hammockDecoder = new HammockDecoderForCirce()
+    Hammock.request(method, uri, Map.empty).as[O].exec[F]
+  }
+
+  def requestWithBody[I, O](
+    uri: Uri, body: I, method: Method)(implicit e: Encoder[I], d: Decoder[O]): F[O] = {
+      implicit val hammockEncoder = new HammockEncoderForCirce()
+      implicit val hammockDecoder = new HammockDecoderForCirce()
+      Hammock.request(method, uri, Map.empty, Some(body)).as[O].exec[F]
+    }
 }
 
 class HttpClient[F[_]](implicit urls: GSheets4sDefaultUrls, requester: HttpRequester[F]) {
