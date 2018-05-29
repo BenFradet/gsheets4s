@@ -100,13 +100,13 @@ object model {
     updatedCells: Int
   )
 
-  final case class Error(
+  final case class GsheetsError(
     code: Int,
     message: String,
     status: String
   )
-  implicit val errorDecoder: Decoder[Error] =
-    deriveDecoder[Error].prepare(_.downField("error"))
+  implicit val errorDecoder: Decoder[GsheetsError] =
+    deriveDecoder[GsheetsError].prepare(_.downField("error"))
 
   final case class Credentials(
     accessToken: String,

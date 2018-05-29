@@ -53,12 +53,12 @@ object arbitraries {
     } yield ValueRange(notation, dim, values)
   }
 
-  implicit def arbError: Arbitrary[Error] = Arbitrary {
+  implicit def arbGsheetsError: Arbitrary[GsheetsError] = Arbitrary {
     for {
       code <- Gen.choose(1, 500)
       msg <- Gen.alphaStr
       status <- Gen.alphaStr
-    } yield Error(code, msg, status)
+    } yield GsheetsError(code, msg, status)
   }
 
   implicit def either[A, B](

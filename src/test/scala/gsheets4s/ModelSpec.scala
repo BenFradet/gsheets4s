@@ -34,15 +34,15 @@ object ModelSpec extends Properties("model") {
     decode[Dimension](d.asJson.noSpaces) == Right(d)
   }
 
-  property("Error decoder") = forAll { e: Error =>
-    decode[Error](Json.obj(("error", e.asJson)).noSpaces) == Right(e)
+  property("GsheetsError decoder") = forAll { e: GsheetsError =>
+    decode[GsheetsError](Json.obj(("error", e.asJson)).noSpaces) == Right(e)
   }
 
-  property("Either decoder") = forAll { e: Either[Error, ValueRange] =>
+  property("Either decoder") = forAll { e: Either[GsheetsError, ValueRange] =>
     e match {
       case Left(l) =>
-        decode[Either[Error, ValueRange]](Json.obj(("error", l.asJson)).noSpaces) == Right(e)
-      case Right(r) => decode[Either[Error, ValueRange]](r.asJson.noSpaces) == Right(e)
+        decode[Either[GsheetsError, ValueRange]](Json.obj(("error", l.asJson)).noSpaces) == Right(e)
+      case Right(r) => decode[Either[GsheetsError, ValueRange]](r.asJson.noSpaces) == Right(e)
     }
   }
 }

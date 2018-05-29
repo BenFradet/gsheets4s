@@ -48,19 +48,20 @@ class RestSpreadsheetsValues private(
     }
   }
 
-  override def get(spreadsheetID: String, range: A1Notation): IO[Either[Error, ValueRange]] =
-    requestWithToken(uri(spreadsheetID, range), request[Either[Error, ValueRange]](Method.GET, _))
+  override def get(spreadsheetID: String, range: A1Notation): IO[Either[GsheetsError, ValueRange]] =
+    requestWithToken(uri(spreadsheetID, range),
+      request[Either[GsheetsError, ValueRange]](Method.GET, _))
 
   override def update(
     spreadsheetID: String,
     range: A1Notation,
     updates: ValueRange,
     valueInputOption: ValueInputOption
-  ): IO[Either[Error, UpdateValuesResponse]] = {
+  ): IO[Either[GsheetsError, UpdateValuesResponse]] = {
     val u = uri(spreadsheetID, range)
       .andThen(_.param("valueInputOption", valueInputOption.value))
     requestWithToken(u,
-      requestWithBody[ValueRange, Either[Error, UpdateValuesResponse]](Method.PUT, _, updates))
+      requestWithBody[ValueRange, Either[GsheetsError, UpdateValuesResponse]](Method.PUT, _, updates))
   }
 
   private def request[O](m: Method, uri: Uri)(implicit d: Decoder[O]): IO[O] =
@@ -72,19 +73,19 @@ class RestSpreadsheetsValues private(
 
   private def requestWithToken[A](
     uriBuilder: String => Uri,
-    ioBuilder: Uri => IO[Either[Error, A]]
-  )(implicit d: Decoder[A]): IO[Either[Error, A]] = for {
+    ioBuilder: Uri => IO[Either[GsheetsError, A]]
+  )(implicit d: Decoder[A]): IO[Either[GsheetsError, A]] = for {
     creds <- creds.get
     builder = ioBuilder compose uriBuilder
     either <- builder(creds.accessToken)
     retried <- either match {
-      case Left(Error(401, _, _)) => requestWithNewToken(builder)
+      case Left(GsheetsError(401, _, _)) => requestWithNewToken(builder)
       case o => IO.pure(o)
     }
   } yield retried
 
-  private def requestWithNewToken[A](
-      builder: String => IO[Either[Error, A]])(implicit d: Decoder[A]): IO[Either[Error, A]] =
+  private def requestWithNewToken[A](builder: String => IO[Either[GsheetsError, A]])(
+      implicit d: Decoder[A]): IO[Either[GsheetsError, A]] =
     for {
       c <- creds.get
       newAccessToken <- request[String](Method.POST, refreshTokenUri(c))(accessTokenDecoder)

@@ -13,7 +13,7 @@ class TestPrograms[F[_]: Monad](alg: SpreadsheetsValues[F]) {
     spreadsheetId: String,
     vr: ValueRange,
     vio: ValueInputOption
-  ): F[Either[Error, (UpdateValuesResponse, ValueRange)]] =
+  ): F[Either[GsheetsError, (UpdateValuesResponse, ValueRange)]] =
     (for {
       updateValuesResponse <- EitherT(update(spreadsheetId, vr.range, vr, vio))
       valueRange <- EitherT(get(spreadsheetId, vr.range))
