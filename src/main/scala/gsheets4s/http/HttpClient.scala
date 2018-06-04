@@ -2,13 +2,17 @@ package gsheets4s
 package http
 
 import cats.~>
+import cats.Monad
 import cats.data.NonEmptyList
 import cats.effect.Sync
+import cats.syntax.flatMap._
+import cats.syntax.functor._
 import hammock._
 import hammock.circe._
+import fs2.async.Ref
 import io.circe.{Encoder, Decoder}
 
-import model.Credentials
+import model.{Credentials, GsheetsError}
 
 trait HttpRequester[F[_]] {
   def request[O](uri: Uri, method: Method)(implicit d: Decoder[O]): F[O]
@@ -30,19 +34,26 @@ class HammockRequester[F[_]: Sync](implicit nat: HammockF ~> F) extends HttpRequ
     }
 }
 
-class HttpClient[F[_]](implicit urls: GSheets4sDefaultUrls, requester: HttpRequester[F]) {
+class HttpClient[F[_]: Monad](creds: Ref[F, Credentials])(
+    implicit urls: GSheets4sDefaultUrls, requester: HttpRequester[F]) {
   def get[O](
-    accessToken: String,
     path: String,
-    params: List[(String, String)] = List.empty)(implicit d: Decoder[O]): F[O] =
-      requester.request(urlBuilder(accessToken, path, params), Method.GET)
+    params: List[(String, String)] = List.empty)(
+    implicit d: Decoder[O]): F[Either[GsheetsError, O]] = for {
+      c <- creds.get
+      res <- requester
+        .request[Either[GsheetsError, O]](urlBuilder(c.accessToken, path, params), Method.GET)
+    } yield res
 
   def put[I, O](
-    accessToken: String,
     path: String,
     body: I,
-    params: List[(String, String)] = List.empty)(implicit e: Encoder[I], d: Decoder[O]): F[O] =
-      requester.requestWithBody(urlBuilder(accessToken, path, params), body, Method.PUT)
+    params: List[(String, String)] = List.empty)(
+    implicit e: Encoder[I], d: Decoder[O]): F[Either[GsheetsError, O]] = for {
+      c <- creds.get
+      res <- requester.requestWithBody[I, Either[GsheetsError, O]](
+        urlBuilder(c.accessToken, path, params), body, Method.PUT)
+    } yield res
 
   def refreshToken(creds: Credentials)(implicit d: Decoder[String]): F[String] = {
     val url = urls.refreshTokenUrl ?
