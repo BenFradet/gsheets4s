@@ -34,8 +34,8 @@ class HammockRequester[F[_]: Sync](implicit nat: HammockF ~> F) extends HttpRequ
     }
 }
 
-class HttpClient[F[_]](creds: Ref[F, Credentials])(
-    implicit urls: GSheets4sDefaultUrls, requester: HttpRequester[F], M: Monad[F]) {
+class HttpClient[F[_]](creds: Ref[F, Credentials], requester: HttpRequester[F])(
+    implicit urls: GSheets4sDefaultUrls, M: Monad[F]) {
   def get[O](
     path: String,
     params: List[(String, String)] = List.empty)(
