@@ -4,11 +4,8 @@ package integration
 import cats.effect.IO
 import eu.timepit.refined.auto._
 import fs2.async
-import hammock.jvm.Interpreter
 import org.scalatest._
 
-import http._
-import interpreters._
 import model._
 
 class SpreadsheetsValuesSpec extends FlatSpec {
@@ -27,14 +24,10 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   val vr = ValueRange(not, Rows, List(List("1", "2"), List("3", "4")))
   val vio = UserEntered
 
-  implicit val interpreter = Interpreter[IO]
-  val requester = new HammockRequester[IO]()
-
   "RestSpreadsheetsValues" should "update and get values" in {
     val res = (for {
       credsRef <- async.refOf[IO, Credentials](creds.get)
-      client = new HttpClient[IO](credsRef, requester)
-      spreadsheetsValues = new RestSpreadsheetsValues(client)
+      spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
       prog <- new TestPrograms(spreadsheetsValues)
         .updateAndGet(spreadsheetID, vr, vio)
     } yield prog).unsafeRunSync()
@@ -49,8 +42,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   it should "report an error if the spreadsheet it doesn't exist" in {
     val res = (for {
       credsRef <- async.refOf[IO, Credentials](creds.get)
-      client = new HttpClient[IO](credsRef, requester)
-      spreadsheetsValues = new RestSpreadsheetsValues(client)
+      spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
       prog <- new TestPrograms(spreadsheetsValues)
         .updateAndGet("not-existing-spreadsheetid", vr, vio)
     } yield prog).unsafeRunSync()
@@ -64,8 +56,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   it should "work with a faulty access token" in {
     val res = (for {
       credsRef <- async.refOf[IO, Credentials](creds.get.copy(accessToken = "faulty"))
-      client = new HttpClient[IO](credsRef, requester)
-      spreadsheetsValues = new RestSpreadsheetsValues(client)
+      spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
       prog <- new TestPrograms(spreadsheetsValues)
         .updateAndGet(spreadsheetID, vr, vio)
     } yield prog).unsafeRunSync()
