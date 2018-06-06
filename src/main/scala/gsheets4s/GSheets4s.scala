@@ -1,7 +1,7 @@
 package gsheets4s
 
 import cats.effect.IO
-import fs2.async
+import fs2.async.Ref
 import hammock.jvm.Interpreter
 
 import algebras._
@@ -16,10 +16,10 @@ case class GSheets4s(
 object GSheets4s {
   implicit val interpreter = Interpreter[IO]
 
-  def apply(creds: Credentials): IO[GSheets4s] = for {
-    credsRef <- async.refOf[IO, Credentials](creds)
-    requester = new HammockRequester[IO]()
-    client = new HttpClient[IO](credsRef, requester)
-    spreadsheetsValues = new RestSpreadsheetsValues(client)
-  } yield GSheets4s(spreadsheetsValues)
+  def apply(creds: Ref[IO, Credentials]): GSheets4s = {
+    val requester = new HammockRequester[IO]()
+    val client = new HttpClient[IO](creds, requester)
+    val spreadsheetsValues = new RestSpreadsheetsValues(client)
+    GSheets4s(spreadsheetsValues)
+  }
 }
