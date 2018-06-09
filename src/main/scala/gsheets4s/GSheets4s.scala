@@ -1,24 +1,23 @@
 package gsheets4s
 
-import cats.effect.IO
+import cats.~>
+import cats.effect.Sync
 import fs2.async.Ref
-import hammock.jvm.Interpreter
+import hammock._
 
 import algebras._
 import http._
 import interpreters._
 import model._
 
-case class GSheets4s(
-  spreadsheetsValues: SpreadsheetsValues[IO]
+case class GSheets4s[F[_]](
+  spreadsheetsValues: SpreadsheetsValues[F]
 )
 
 object GSheets4s {
-  implicit val interpreter = Interpreter[IO]
-
-  def apply(creds: Ref[IO, Credentials]): GSheets4s = {
-    val requester = new HammockRequester[IO]()
-    val client = new HttpClient[IO](creds, requester)
+  def apply[F[_]: Sync](creds: Ref[F, Credentials])(implicit nat: HammockF ~> F): GSheets4s[F] = {
+    val requester = new HammockRequester[F]()
+    val client = new HttpClient[F](creds, requester)
     val spreadsheetsValues = new RestSpreadsheetsValues(client)
     GSheets4s(spreadsheetsValues)
   }
