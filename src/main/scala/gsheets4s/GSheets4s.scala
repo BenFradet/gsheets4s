@@ -2,7 +2,7 @@ package gsheets4s
 
 import cats.~>
 import cats.effect.Sync
-import fs2.async.Ref
+import cats.effect.concurrent.Ref
 import hammock._
 
 import algebras._

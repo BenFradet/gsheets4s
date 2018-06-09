@@ -5,11 +5,11 @@ import cats.~>
 import cats.Monad
 import cats.data.NonEmptyList
 import cats.effect.Sync
+import cats.effect.concurrent.Ref
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 import hammock._
 import hammock.circe._
-import fs2.async.Ref
 import io.circe.{Encoder, Decoder}
 
 import model.{Credentials, GsheetsError}
@@ -63,7 +63,7 @@ class HttpClient[F[_]](creds: Ref[F, Credentials], requester: HttpRequester[F])(
   private def reqWithNewToken[O](
     req: String => F[Either[GsheetsError, O]], c: Credentials): F[Either[GsheetsError, O]] = for {
       newToken <- refreshToken(c)(Decoder.decodeString.prepare(_.downField("access_token")))
-      _ <- creds.setAsync(c.copy(accessToken = newToken))
+      _ <- creds.set(c.copy(accessToken = newToken))
       r <- req(newToken)
     } yield r
 

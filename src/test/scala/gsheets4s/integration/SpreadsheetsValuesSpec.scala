@@ -2,8 +2,8 @@ package gsheets4s
 package integration
 
 import cats.effect.IO
+import cats.effect.concurrent.Ref
 import eu.timepit.refined.auto._
-import fs2.async
 import org.scalatest._
 
 import model._
@@ -28,7 +28,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
 
   "RestSpreadsheetsValues" should "update and get values" in {
     val res = (for {
-      credsRef <- async.refOf[IO, Credentials](creds.get)
+      credsRef <- Ref.of[IO, Credentials](creds.get)
       spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
       prog <- new TestPrograms(spreadsheetsValues)
         .updateAndGet(spreadsheetID, vr, vio)
@@ -43,7 +43,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
 
   it should "report an error if the spreadsheet it doesn't exist" in {
     val res = (for {
-      credsRef <- async.refOf[IO, Credentials](creds.get)
+      credsRef <- Ref.of[IO, Credentials](creds.get)
       spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
       prog <- new TestPrograms(spreadsheetsValues)
         .updateAndGet("not-existing-spreadsheetid", vr, vio)
@@ -57,7 +57,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
 
   it should "work with a faulty access token" in {
     val res = (for {
-      credsRef <- async.refOf[IO, Credentials](creds.get.copy(accessToken = "faulty"))
+      credsRef <- Ref.of[IO, Credentials](creds.get.copy(accessToken = "faulty"))
       spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
       prog <- new TestPrograms(spreadsheetsValues)
         .updateAndGet(spreadsheetID, vr, vio)
