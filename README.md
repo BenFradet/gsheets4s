@@ -49,12 +49,9 @@ import gsheet4s.model._
 val creds = Credentials(accessToken, refreshToken, clientId, clientSecret)
 val spreadsheetID = "1tk2S_A4LZfeZjoMskbfFXO42_b75A7UkSdhKaQZlDmA"
 val valueRange = {
-  val notation = SheetNameRangeNotation("Sheet1",
-    Range(ColRowPosition("A", 1), ColRowPosition("B", 2)))
+  val notation = RangeNotation(Range(ColRowPosition("A", 1), ColRowPosition("B", 2)))
   ValueRange(notation, Rows, List(List("1", "2"), List("3", "4")))
 }
-
-implicit val interpreter = hammock.jvm.Interpreter[IO]
 
 val resIO = for {
   credsRef <- Ref.of[IO, Credentials](creds)
@@ -96,9 +93,8 @@ Here's the list of currently supported endpoints:
 ### Tagless final
 
 gsheets4s uses Tagless final encoding for easy composition between the different APIs and
-to leave the choice of effect type to the user as long as you provide a natural transformation
-between [HammockF](https://static.javadoc.io/com.pepegar/hammock-core_2.12/0.8.4/hammock/index.html#HammockF[A]=cats.data.EitherK[hammock.HttpF,hammock.marshalling.MarshallF,A])
-and your effect type `F`.
+to leave the choice of effect type to the user as long as you provide an instance of
+`cats.effect.Sync` for your effect type `F`.
 
 ### Typesafe data
 

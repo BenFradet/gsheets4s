@@ -24,8 +24,6 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   val vr = ValueRange(not, Rows, List(List("1", "2"), List("3", "4")))
   val vio = UserEntered
 
-  implicit val interpreter = hammock.jvm.Interpreter[IO]
-
   "RestSpreadsheetsValues" should "update and get values" in {
     val res = (for {
       credsRef <- Ref.of[IO, Credentials](creds.get)

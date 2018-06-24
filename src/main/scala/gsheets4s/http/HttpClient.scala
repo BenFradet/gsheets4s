@@ -1,7 +1,6 @@
 package gsheets4s
 package http
 
-import cats.~>
 import cats.Monad
 import cats.data.NonEmptyList
 import cats.effect.Sync
@@ -20,7 +19,9 @@ trait HttpRequester[F[_]] {
     uri: Uri, body: I, method: Method)(implicit e: Encoder[I], d: Decoder[O]): F[O]
 }
 
-class HammockRequester[F[_]: Sync](implicit nat: HammockF ~> F) extends HttpRequester[F] {
+class HammockRequester[F[_]: Sync] extends HttpRequester[F] {
+  implicit val interpreter = hammock.jvm.Interpreter[F]
+
   def request[O](uri: Uri, method: Method)(implicit d: Decoder[O]): F[O] = {
     implicit val hammockDecoder = new HammockDecoderForCirce()
     Hammock.request(method, uri, Map.empty).as[O].exec[F]
@@ -34,8 +35,8 @@ class HammockRequester[F[_]: Sync](implicit nat: HammockF ~> F) extends HttpRequ
     }
 }
 
-class HttpClient[F[_]](creds: Ref[F, Credentials], requester: HttpRequester[F])(
-    implicit urls: GSheets4sDefaultUrls, M: Monad[F]) {
+class HttpClient[F[_]: Monad](creds: Ref[F, Credentials], requester: HttpRequester[F])(
+    implicit urls: GSheets4sDefaultUrls) {
   def get[O](
     path: String,
     params: List[(String, String)] = List.empty)(
@@ -56,7 +57,7 @@ class HttpClient[F[_]](creds: Ref[F, Credentials], requester: HttpRequester[F])(
     first <- req(c.accessToken)
     retried <- first match {
       case Left(GsheetsError(401, _, _)) => reqWithNewToken(req, c)
-      case o => M.pure(o)
+      case o => Monad[F].pure(o)
     }
   } yield retried
 
