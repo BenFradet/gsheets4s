@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/BenFradet/gsheets4s.svg?branch=master)](https://travis-ci.org/BenFradet/gsheets4s)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.benfradet/gsheets4s_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.benfradet/gsheets4s_2.12)
+[![codecov](https://codecov.io/gh/BenFradet/gsheets4s/branch/master/graph/badge.svg)](https://codecov.io/gh/BenFradet/gsheets4s)
 
 Scala wrapper around [the Google Sheets API](https://developers.google.com/sheets/api/reference/rest/)
 

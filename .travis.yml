@@ -3,6 +3,12 @@ language: scala
 scala:
   - 2.12.6
 
+script:
+  - sbt coverage test coverageReport
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 env:
   global:
     - secure: "a5nZBIxBWqrm7Wyxta7tMjLbS0UsTcTciKb4WW/ORvFnZXZYUeJ7TPJnF9fgkZE0SakvxDk7Ep/rh9uSMn+iXMyWImrFbfeCxagCakCy7JnJzwO/vpZbjL9BJKHUiLh0CqKe5OYNzAzT52Y5MyLTWPwmszQvW2lw6ifwavErKep1zEIfZhtXJCWYxAPNnYetbTMGY6a5NRZsJAbo0bkQGKA3wjl82lYj9Gk5+geLLI0pcA9y6+C6k+08aU+3yDlTzaAQsBOjzV+eTVaWmTHdD/YIvywoKXJEbdBzl7VPiMYBDA6VcAoxKfYqTtgX8/mU79iJd+KSBHgQIR+KweBVyADFrwQ0cYHUdP7A97Q8gMQrTNUgWEXA2buj35YssjuvuOUyw1uPEkIuXZSiM4dDvc8WUJCyACH6Y9x4a+hWAZM4mEfOPPZWheX1yh0tZ4owB1HNZAOFuiO9RUerZ6GXUAxNBZbPdaEaamk6AhF0CsgJPDnjlR40L5qXKfy7eYll30wEY4jY3y3rpEHcdUPJef8kn3znE8XQ2Q1dozVa5nSRHtgOwrItC9ynQ58+tGG0I14ac+ir36XsuZW5t26r9B5fhtce5mHFqN/tiUyY3R2ulW58SBvS5B1I2coe/10UONSsDHUWCUnJUosH3CsuQ460GU+MkMsNy8v7KxZoiEw="
