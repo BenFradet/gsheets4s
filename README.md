@@ -14,6 +14,20 @@ gsheets4s is available for Scala 2.12 on Maven central at the following coordina
 "com.github.benfradet" %% "gsheets4s" % "0.1.0"
 ```
 
+## Credentials management
+
+gsheets4s uses OAuth 2.0 to authenticate requests made to Google servers, the process to get your OAuth 2.0
+credentials is detailed at: https://developers.google.com/identity/protocols/OAuth2ForDevices.
+
+Out of this process, gsheets4s needs:
+
+- an initial access token (it will take care of refreshing it when needed)
+- a refresh token
+- a client ID
+- a client secret
+
+The last three are needed in order to refresh the access token as it is valid for only one hour.
+
 ## Usage
 
 Here's a program you could write that updates and consecutively gets contents from a spreadhseet:
