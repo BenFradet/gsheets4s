@@ -113,7 +113,8 @@ to leave the choice of effect type to the user as long as you provide an instanc
 
 ### Typesafe data
 
-gsheets4s uses fthomas/refined and tpolecat/atto to make sure
+gsheets4s uses [refined](https://github.com/fthomas/refined) and
+[atto](https://github.com/tpolecat/atto) to make sure
 [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation) is respected at
 compile-time when you refer to a group of cells in a spreadsheet.
 
@@ -126,13 +127,13 @@ needed.
 
 Here are the projects I got inspiration from when building gsheets4s:
 
-- cchantep/foorgol
-- 47deg/github4s
+- [foorgol](https://github.com/cchantep/foorgol)
+- [github4s](https://github.com/47deg/github4s)
 
 Here are the projects used in the library:
 
-- pepegar/hammock
-- typelevel/cats-effect
-- circe/circe
-- fthomas/refined
-- tpolecat/atto
+- [hammock](https://github.com/pepegar/hammock)
+- [cats-effect](https://github.com/typelevel/cats-effect)
+- [circe](https://github.com/circe/circe)
+- [refined](https://github.com/fthomas/refined)
+- [atto](https://github.com/tpolecat/atto)
