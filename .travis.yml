@@ -3,8 +3,20 @@ language: scala
 scala:
   - 2.12.6
 
-script:
-  - sbt coverage test coverageReport
+before_install:
+  - git fetch --tags
+
+stages:
+  - name: test
+  - name: release
+    if: (branch = master AND type = push) OR (tag IS present)
+
+jobs:
+  include:
+    - stage: test
+      script: sbt coverage test coverageReport
+    - stage: release
+      script: sbt ci-release
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

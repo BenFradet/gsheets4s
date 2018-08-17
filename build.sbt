@@ -1,4 +1,16 @@
-organization in ThisBuild := "com.github.benfradet"
+inThisBuild(List(
+  organization := "com.github.benfradet",
+  homepage := Some(url("https://github.com/BenFradet/gsheets4s")),
+  licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+  developers := List(
+    Developer(
+      "BenFradet",
+      "Ben Fradet",
+      "benjamin.fradet@gmail.com",
+      url("https://benfradet.github.io")
+    )
+  )
+))
 
 lazy val compilerOptions = Seq(
   "-deprecation",
@@ -24,7 +36,6 @@ lazy val baseSettings = Seq(
     _.filterNot(Set("-Ywarn-unused-import"))
   },
   scalaVersion := "2.12.6",
-  version := "0.1.0-SNAPSHOT"
 )
 
 lazy val catsVersion = "1.1.0"
