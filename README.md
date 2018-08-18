@@ -54,27 +54,54 @@ class Program[F[_]: Monad](alg: SpreadsheetsValues[F]) {
 }
 ```
 
-And here's how you could run it leveraging cats-effect's `IO`:
+And here's how you could use it leveraging cats-effect's `Sync`:
+
+```scala
+import cats.effect.Sync
+import cats.effect.concurrent.Ref
+import cats.syntax.flatMap._
+import cats.syntax.functor._
+import eu.timepit.refined.auto._
+import gsheets4s.GSheets4s
+import gsheets4s.model._
+
+class GSheetsService[F[_]: Sync](credentials: Ref[F, Credentials]) {
+  val spreadsheetID = "1tk2S_A4LZfeZjoMskbfFXO42_b75A7UkSdhKaQZlDmA"
+  val valueRange = {
+    val notation = RangeNotation(Range(ColRowPosition("A", 1), ColRowPosition("B", 2)))
+    ValueRange(notation, Rows, List(List("1", "2"), List("3", "4")))
+  }
+
+  def updateAndGet: F[Either[GsheetsError, List[String]]] = for {
+    spreadsheetsValues <- Sync[F].pure(GSheets4s[F](credentials).spreadsheetsValues)
+    prog <- new Program[F](spreadsheetsValues)
+      .updateAndGet(spreadsheetID, valueRange, UserEntered)
+    res = prog.map(_._2.values.flatten)
+  } yield res
+}
+
+object GSheetsService {
+  def apply[F[_]: Sync](credentials: Credentials): F[GSheetsService[F]] =
+    Ref.of[F, Credentials](credentials)
+      .map(ref => new GSheetsService[F](ref))
+}
+```
+
+Finally, here's how you could run it using cats-effect's `IO`:
 
 ```scala
 import cats.effect.IO
-import cats.effect.concurrent.Ref
-import eu.timepit.refined.auto._
-import gsheet4s.model._
 
-val creds = Credentials(accessToken, refreshToken, clientId, clientSecret)
-val spreadsheetID = "1tk2S_A4LZfeZjoMskbfFXO42_b75A7UkSdhKaQZlDmA"
-val valueRange = {
-  val notation = RangeNotation(Range(ColRowPosition("A", 1), ColRowPosition("B", 2)))
-  ValueRange(notation, Rows, List(List("1", "2"), List("3", "4")))
+object Main {
+  def main(args: Array[String]): Unit = {
+    val creds = Credentials(accessToken, refreshToken, clientId, clientSecret)
+    val io = for {
+      service <- GSheetsService[IO](creds)
+      res <- service.updateAndGet
+    } yield res
+    io.unsafeRunSync()
+  }
 }
-
-val resIO = for {
-  credsRef <- Ref.of[IO, Credentials](creds)
-  spreadsheetsValues = GSheets4s[IO](credsRef).spreadsheetsValues
-  prog <- new Program(spreadsheetsValues)
-    .updateAndGet(spreadsheetID, vr, UserEntered)
-} yield prog
 ```
 
 ## Features
