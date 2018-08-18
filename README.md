@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/BenFradet/gsheets4s.svg?branch=master)](https://travis-ci.org/BenFradet/gsheets4s)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.benfradet/gsheets4s_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.benfradet/gsheets4s_2.12)
-[![codecov](https://codecov.io/gh/BenFradet/gsheets4s/branch/master/graph/badge.svg)](https://codecov.io/gh/BenFradet/gsheets4s) 
+[![codecov](https://codecov.io/gh/BenFradet/gsheets4s/branch/master/graph/badge.svg)](https://codecov.io/gh/BenFradet/gsheets4s)
 [![Join the chat at https://gitter.im/BenFradet/gsheets4s](https://badges.gitter.im/BenFradet/gsheets4s.svg)](https://gitter.im/BenFradet/gsheets4s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Scala wrapper around [the Google Sheets API](https://developers.google.com/sheets/api/reference/rest/)
@@ -106,11 +106,11 @@ Here's the list of currently supported endpoints:
   - [x] `get`
   - [x] `update`
 
-### Tagless final
+### Abstracting over the effect type
 
-gsheets4s uses Tagless final encoding for easy composition between the different APIs and
-to leave the choice of effect type to the user as long as you provide an instance of
-`cats.effect.Sync` for your effect type `F`.
+gsheets4s abstracts over the effect type `F` by using tagless final encoding for easy composition
+between the different APIs and to leave the choice of effect type to the user as long as you provide
+an instance of `cats.effect.Sync` for your effect type `F`.
 
 ### Typesafe data
 
