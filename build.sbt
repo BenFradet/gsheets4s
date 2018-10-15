@@ -43,7 +43,7 @@ lazy val catsEffectVersion = "1.0.0-RC2"
 lazy val circeVersion = "0.9.3"
 lazy val refinedVersion = "0.9.0"
 lazy val attoVersion = "0.6.2"
-lazy val hammockVersion = "0.8.5"
+lazy val hammockVersion = "0.8.6"
 lazy val scalacheckVersion = "1.13.5"
 lazy val scalatestVersion = "3.0.5"
 
