@@ -12,7 +12,7 @@ Scala wrapper around [the Google Sheets API](https://developers.google.com/sheet
 gsheets4s is available for Scala 2.12 on Maven central at the following coordinates:
 
 ```bash
-"com.github.benfradet" %% "gsheets4s" % "0.1.0"
+"com.github.benfradet" %% "gsheets4s" % "0.2.0"
 ```
 
 ## Credentials management
