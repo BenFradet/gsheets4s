@@ -8,6 +8,7 @@ import cats.effect.concurrent.Ref
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 import hammock._
+import hammock.apache.ApacheInterpreter
 import hammock.circe._
 import io.circe.{Encoder, Decoder}
 
@@ -20,7 +21,7 @@ trait HttpRequester[F[_]] {
 }
 
 class HammockRequester[F[_]: Sync] extends HttpRequester[F] {
-  implicit val interpreter = hammock.jvm.Interpreter[F]
+  implicit val interpreter = ApacheInterpreter[F]
 
   def request[O](uri: Uri, method: Method)(implicit d: Decoder[O]): F[O] = {
     implicit val hammockDecoder = new HammockDecoderForCirce()
