@@ -4,6 +4,7 @@ package integration
 import cats.data.NonEmptyList
 import cats.effect.IO
 import cats.effect.concurrent.Ref
+import cats.syntax.show._
 import eu.timepit.refined.auto._
 import org.scalatest._
 
@@ -41,17 +42,19 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   }
 
   it should "be able to retrieve multiple ranges" in {
-    val not = SheetNameRangesNotation("Sheet1",
+    val not: A1Notation = SheetNameRangesNotation("Sheet1",
       NonEmptyList.of(
         Range(ColPosition("D"), ColPosition("D")),
         Range(ColPosition("G"), ColPosition("G"))
       )
     )
+    println(not.show)
     val res = (for {
       credsRef <- Ref.of[IO, Credentials](creds.get)
       spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
       prog <- new TestPrograms(spreadsheetsValues).get(spreadsheetID, not)
     } yield prog).unsafeRunSync()
+    println(res)
     assert(res.isRight)
     val Right(vr) = res
     assert(vr.values.flatten == List("D", "G"))
