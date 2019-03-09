@@ -1,5 +1,6 @@
 package gsheets4s
 
+import cats.data.NonEmptyList
 import eu.timepit.refined.scalacheck.any._
 import org.scalacheck.{Arbitrary, Gen}
 
@@ -32,10 +33,11 @@ object arbitraries {
     for {
       sheetName <- nonEmptyUpperChars
       range <- arbRange.arbitrary
+      ranges <- Gen.listOf(range)
       notation <- Gen.oneOf(
         SheetNameNotation(sheetName),
-        RangeNotation(range),
-        SheetNameRangeNotation(sheetName, range)
+        RangesNotation(NonEmptyList.of(range, ranges: _*)),
+        SheetNameRangesNotation(sheetName, NonEmptyList.of(range, ranges: _*))
       )
     } yield notation
   }

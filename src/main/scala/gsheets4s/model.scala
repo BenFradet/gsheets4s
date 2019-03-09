@@ -4,6 +4,7 @@ import atto._
 import atto.Atto._
 import atto.syntax.refined._
 import cats.Show
+import cats.data.NonEmptyList
 import cats.syntax.apply._
 import cats.syntax.either._
 import cats.syntax.show._
@@ -51,18 +52,22 @@ object model {
   object A1Notation {
     implicit val showA1Notation: Show[A1Notation] = Show.show {
       case SheetNameNotation(s) => s.toString
-      case RangeNotation(r) => r.show
-      case SheetNameRangeNotation(s, r) => s"$s!${r.show}"
+      case RangesNotation(rs) => rs.map(_.show).toList.mkString(",")
+      case SheetNameRangesNotation(s, rs) =>
+        val rsShow = rs.map(_.show).toList.mkString(",")
+        s"$s!$rsShow"
     }
     val parser: Parser[A1Notation] =
-      (takeWhile(_ != '!') <~ Atto.char('!'), Range.parser)
-        .mapN(SheetNameRangeNotation.apply) |
-          Range.parser.map(RangeNotation(_): A1Notation) |
+      (takeWhile(_ != '!') <~ Atto.char('!'), Range.parser, many(Atto.char(',') ~> Range.parser))
+        .mapN { case (n, r, rs) => SheetNameRangesNotation(n, NonEmptyList.of(r, rs: _*)) } |
+          (Range.parser, many(Atto.char(',') ~> Range.parser))
+            .mapN { case (r, rs) => RangesNotation(NonEmptyList.of(r, rs: _*)): A1Notation } |
           stringOf1(elem(_ => true)).map(SheetNameNotation(_): A1Notation)
   }
   final case class SheetNameNotation(sheetName: String) extends A1Notation
-  final case class RangeNotation(range: Range) extends A1Notation
-  final case class SheetNameRangeNotation(sheetName: String, range: Range) extends A1Notation
+  final case class RangesNotation(ranges: NonEmptyList[Range]) extends A1Notation
+  final case class SheetNameRangesNotation(sheetName: String, ranges: NonEmptyList[Range])
+    extends A1Notation
   implicit val a1NotationDecoder: Decoder[A1Notation] = Decoder.decodeString.flatMap { s =>
     new Decoder[A1Notation] {
       final def apply(c: HCursor): Decoder.Result[A1Notation] =

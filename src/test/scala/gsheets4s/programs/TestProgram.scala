@@ -7,15 +7,19 @@ import algebras._
 import model._
 
 class TestPrograms[F[_]: Monad](alg: SpreadsheetsValues[F]) {
-  import alg._
-
   def updateAndGet(
     spreadsheetId: String,
     vr: ValueRange,
     vio: ValueInputOption
   ): F[Either[GsheetsError, (UpdateValuesResponse, ValueRange)]] =
     (for {
-      updateValuesResponse <- EitherT(update(spreadsheetId, vr.range, vr, vio))
-      valueRange <- EitherT(get(spreadsheetId, vr.range))
+      updateValuesResponse <- EitherT(alg.update(spreadsheetId, vr.range, vr, vio))
+      valueRange <- EitherT(alg.get(spreadsheetId, vr.range))
     } yield (updateValuesResponse, valueRange)).value
+
+  def get(
+    spreadsheetId: String,
+    not: A1Notation,
+  ): F[Either[GsheetsError, ValueRange]] =
+    alg.get(spreadsheetId, not)
 }

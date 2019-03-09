@@ -1,6 +1,7 @@
 package gsheets4s
 package integration
 
+import cats.data.NonEmptyList
 import cats.effect.IO
 import cats.effect.concurrent.Ref
 import eu.timepit.refined.auto._
@@ -19,8 +20,8 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   assume(creds.isDefined)
 
   val spreadsheetID = "1tk2S_A4LZfeZjoMskbfFXO42_b75A7UkSdhKaQZlDmA"
-  val not = SheetNameRangeNotation("Sheet1",
-    Range(ColRowPosition("A", 1), ColRowPosition("B", 2)))
+  val not = SheetNameRangesNotation("Sheet1",
+    NonEmptyList.one(Range(ColRowPosition("A", 1), ColRowPosition("B", 2))))
   val vr = ValueRange(not, Rows, List(List("1", "2"), List("3", "4")))
   val vio = UserEntered
 
@@ -37,6 +38,23 @@ class SpreadsheetsValuesSpec extends FlatSpec {
     assert(uvr.updatedRange == vr.range)
     assert(vr.range == vr2.range)
     assert(vr.values == vr2.values)
+  }
+
+  it should "be able to retrieve multiple ranges" in {
+    val not = SheetNameRangesNotation("Sheet1",
+      NonEmptyList.of(
+        Range(ColPosition("D"), ColPosition("D")),
+        Range(ColPosition("G"), ColPosition("G"))
+      )
+    )
+    val res = (for {
+      credsRef <- Ref.of[IO, Credentials](creds.get)
+      spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
+      prog <- new TestPrograms(spreadsheetsValues).get(spreadsheetID, not)
+    } yield prog).unsafeRunSync()
+    assert(res.isRight)
+    val Right(vr) = res
+    assert(vr.values.flatten == List("D", "G"))
   }
 
   it should "report an error if the spreadsheet it doesn't exist" in {
