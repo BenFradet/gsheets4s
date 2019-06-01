@@ -85,6 +85,6 @@ class HttpClient[F[_]: Monad](creds: Ref[F, Credentials], requester: HttpRequest
   private def urlBuilder(
     accessToken: String,
     path: String,
-    params: List[(String, String)] = List.empty): Uri =
+    params: List[(String, String)]): Uri =
       (urls.baseUrl / path) ? NonEmptyList(("access_token" -> accessToken), params)
 }
