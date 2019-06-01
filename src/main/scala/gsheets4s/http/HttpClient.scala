@@ -21,7 +21,7 @@ trait HttpRequester[F[_]] {
 }
 
 class HammockRequester[F[_]: Sync] extends HttpRequester[F] {
-  implicit val interpreter = ApacheInterpreter[F]
+  implicit val interpreter = ApacheInterpreter.instance[F]
 
   def request[O](uri: Uri, method: Method)(implicit d: Decoder[O]): F[O] = {
     implicit val hammockDecoder = new HammockDecoderForCirce()
