@@ -8,6 +8,9 @@ import org.scalatest._
 
 import model._
 
+object Integration extends Tag(
+  if (sys.env.get("GSHEETS4S_ACCESS_TOKEN").isDefined) "" else classOf[Ignore].getName)
+
 class SpreadsheetsValuesSpec extends FlatSpec {
 
   val creds = for {
@@ -16,7 +19,6 @@ class SpreadsheetsValuesSpec extends FlatSpec {
     clientId <- sys.env.get("GSHEETS4S_CLIENT_ID")
     clientSecret <- sys.env.get("GSHEETS4S_CLIENT_SECRET")
   } yield Credentials(accessToken, refreshToken, clientId, clientSecret)
-  assume(creds.isDefined)
 
   val spreadsheetID = "1tk2S_A4LZfeZjoMskbfFXO42_b75A7UkSdhKaQZlDmA"
   val not = SheetNameRangeNotation("Sheet1",
@@ -24,7 +26,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
   val vr = ValueRange(not, Rows, List(List("1", "2"), List("3", "4")))
   val vio = UserEntered
 
-  "RestSpreadsheetsValues" should "update and get values" in {
+  "RestSpreadsheetsValues" should "update and get values" taggedAs Integration in {
     val res = (for {
       credsRef <- Ref.of[IO, Credentials](creds.get)
       spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
@@ -39,7 +41,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
     assert(vr.values == vr2.values)
   }
 
-  it should "report an error if the spreadsheet it doesn't exist" in {
+  it should "report an error if the spreadsheet it doesn't exist" taggedAs Integration in {
     val res = (for {
       credsRef <- Ref.of[IO, Credentials](creds.get)
       spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
@@ -53,7 +55,7 @@ class SpreadsheetsValuesSpec extends FlatSpec {
     assert(err.status == "NOT_FOUND")
   }
 
-  it should "work with a faulty access token" in {
+  it should "work with a faulty access token" taggedAs Integration in {
     val res = (for {
       credsRef <- Ref.of[IO, Credentials](creds.get.copy(accessToken = "faulty"))
       spreadsheetsValues = GSheets4s(credsRef).spreadsheetsValues
