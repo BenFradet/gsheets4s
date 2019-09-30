@@ -41,10 +41,10 @@ lazy val baseSettings = Seq(
 lazy val catsVersion = "2.0.0"
 lazy val catsEffectVersion = "2.0.0"
 lazy val circeVersion = "0.12.1"
-lazy val refinedVersion = "0.9.10"
-lazy val attoVersion = "0.7.0"
+lazy val refinedVersion = "0.9.9"
+lazy val attoVersion = "0.7.1"
 lazy val hammockVersion = "0.9.2"
-lazy val scalacheckVersion = "1.14.0"
+lazy val scalacheckVersion = "1.14.2"
 lazy val scalatestVersion = "3.0.8"
 
 lazy val gsheets4s = project.in(file("."))
