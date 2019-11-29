@@ -7,11 +7,12 @@ import eu.timepit.refined.auto._
 import org.scalatest._
 
 import model._
+import org.scalatest.flatspec.AnyFlatSpec
 
 object Integration extends Tag(
   if (sys.env.get("GSHEETS4S_ACCESS_TOKEN").isDefined) "" else classOf[Ignore].getName)
 
-class SpreadsheetsValuesSpec extends FlatSpec {
+class SpreadsheetsValuesSpec extends AnyFlatSpec {
 
   val creds = for {
     accessToken <- sys.env.get("GSHEETS4S_ACCESS_TOKEN")
