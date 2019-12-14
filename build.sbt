@@ -44,7 +44,7 @@ lazy val circeVersion = "0.12.3"
 lazy val refinedVersion = "0.9.10"
 lazy val attoVersion = "0.7.2"
 lazy val hammockVersion = "0.10.0"
-lazy val scalacheckVersion = "1.14.2"
+lazy val scalacheckVersion = "1.14.3"
 lazy val scalatestVersion = "3.1.0"
 
 lazy val gsheets4s = project.in(file("."))
