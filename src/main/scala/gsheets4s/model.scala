@@ -12,10 +12,11 @@ import eu.timepit.refined.boolean._
 import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
+import gsheets4s.model.A1Notation
 import io.circe.{Decoder, DecodingFailure, Encoder, HCursor}
 import io.circe.generic.semiauto._
 
-object model {
+object model extends A1NotationLiteralSyntax {
   type ValidCol = NonEmpty And Forall[UpperCase]
   type Col = String Refined ValidCol
   type ValidRow = Positive
@@ -59,6 +60,35 @@ object model {
         .mapN(SheetNameRangeNotation.apply) |
           Range.parser.map(RangeNotation(_): A1Notation) |
           stringOf1(elem(_ => true)).map(SheetNameNotation(_): A1Notation)
+
+    /** Thanks to ip4s for the singlePartInterpolator implementation
+     * https://github.com/Comcast/ip4s/blob/b4f01a4637f2766a8e12668492a3814c478c6a03/shared/src/main/scala/com/comcast/ip4s/LiteralSyntaxMacros.scala
+     */
+    object LiteralSyntaxMacros {
+      import scala.reflect.macros.blackbox
+
+      def a1NotationInterpolator(c: blackbox.Context)(args: c.Expr[Any]*): c.Expr[A1Notation] =
+        singlePartInterpolator(c)(
+          args,
+          "A1Notation",
+          A1Notation.parser.parseOnly(_).either,
+          s => c.universe.reify(A1Notation.parser.parseOnly(s.splice).option.get))
+
+      private def singlePartInterpolator[A](c: blackbox.Context)(
+        args: Seq[c.Expr[Any]],
+        typeName: String,
+        validate: String => Either[String, _],
+        construct: c.Expr[String] => c.Expr[A]): c.Expr[A] = {
+        import c.universe._
+        identity(args)
+        c.prefix.tree match {
+          case Apply(_, List(Apply(_, (lcp@Literal(Constant(p: String))) :: Nil))) =>
+            val valid = validate(p)
+            if (valid.isRight) construct(c.Expr(lcp))
+            else c.abort(c.enclosingPosition, s"invalid $typeName: ${valid.left.get}")
+        }
+      }
+    }
   }
   final case class SheetNameNotation(sheetName: String) extends A1Notation
   final case class RangeNotation(range: Range) extends A1Notation
@@ -117,4 +147,13 @@ object model {
 
   implicit def eitherDecoder[L, R](implicit l: Decoder[L], r: Decoder[R]): Decoder[Either[L, R]] =
     r.map(Right(_): Either[L, R]).or(l.map(Left(_): Either[L, R]))
+}
+
+trait A1NotationLiteralSyntax {
+  implicit def toA1NotationLiteralOps(sc: StringContext): A1NotationLiteralOps =
+    new A1NotationLiteralOps(sc)
+}
+
+final class A1NotationLiteralOps(val sc: StringContext) extends AnyVal {
+  def a1(args: Any*): A1Notation = macro A1Notation.LiteralSyntaxMacros.a1NotationInterpolator
 }
