@@ -15,6 +15,7 @@ import eu.timepit.refined.numeric._
 import gsheets4s.model.A1Notation
 import io.circe.{Decoder, DecodingFailure, Encoder, HCursor}
 import io.circe.generic.semiauto._
+import io.lemonlabs.uri.typesafe._
 
 object model extends A1NotationLiteralSyntax {
   type ValidCol = NonEmpty And Forall[UpperCase]
@@ -50,6 +51,7 @@ object model extends A1NotationLiteralSyntax {
 
   sealed trait A1Notation
   object A1Notation {
+    implicit val pathPartA1Notation: PathPart[A1Notation] = _.show
     implicit val showA1Notation: Show[A1Notation] = Show.show {
       case SheetNameNotation(s) => s.toString
       case RangeNotation(r) => r.show

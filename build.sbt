@@ -46,6 +46,7 @@ lazy val attoVersion = "0.7.2"
 lazy val hammockVersion = "0.10.0"
 lazy val scalacheckVersion = "1.14.3"
 lazy val scalatestVersion = "3.1.0"
+lazy val scalaUriVersion = "2.0.0"
 
 lazy val gsheets4s = project.in(file("."))
   .settings(name := "gsheets4s")
@@ -54,7 +55,8 @@ lazy val gsheets4s = project.in(file("."))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % catsVersion,
       "org.typelevel" %% "cats-effect" % catsEffectVersion,
-      "eu.timepit" %% "refined" % refinedVersion
+      "eu.timepit" %% "refined" % refinedVersion,
+      "io.lemonlabs" %% "scala-uri" % scalaUriVersion,
     ) ++ Seq(
       "io.circe" %% "circe-core",
       "io.circe" %% "circe-generic",
