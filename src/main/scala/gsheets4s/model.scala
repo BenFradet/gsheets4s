@@ -12,6 +12,7 @@ import eu.timepit.refined.boolean._
 import eu.timepit.refined.char._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
+import eu.timepit.refined.types.string.NonEmptyString
 import gsheets4s.model.A1Notation
 import io.circe.{Decoder, DecodingFailure, Encoder, HCursor}
 import io.circe.generic.semiauto._
@@ -149,6 +150,8 @@ object model extends A1NotationLiteralSyntax {
 
   implicit def eitherDecoder[L, R](implicit l: Decoder[L], r: Decoder[R]): Decoder[Either[L, R]] =
     r.map(Right(_): Either[L, R]).or(l.map(Left(_): Either[L, R]))
+
+  implicit val pathPartNonEmptyString: PathPart[NonEmptyString] = _.value
 }
 
 trait A1NotationLiteralSyntax {
