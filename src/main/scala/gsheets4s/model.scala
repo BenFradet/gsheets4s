@@ -119,6 +119,10 @@ object model extends A1NotationLiteralSyntax {
   case object Raw extends ValueInputOption("RAW")
   case object UserEntered extends ValueInputOption("USER_ENTERED")
 
+  sealed abstract class InsertDataOption(val value: String)
+  case object Overwrite extends InsertDataOption("OVERWRITE")
+  case object InsertRows extends InsertDataOption("INSERT_ROWS")
+
   final case class ValueRange(
     range: A1Notation,
     majorDimension: Dimension,
@@ -132,6 +136,11 @@ object model extends A1NotationLiteralSyntax {
     updatedColumns: Int,
     updatedCells: Int
   )
+
+  final case class AppendValuesResponse(spreadsheetId: String,
+                                        tableRange: A1Notation,
+                                        updates: UpdateValuesResponse,
+                                       )
 
   final case class GsheetsError(
     code: Int,

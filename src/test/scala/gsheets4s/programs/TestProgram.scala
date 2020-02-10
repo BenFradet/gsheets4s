@@ -19,4 +19,14 @@ class TestPrograms[F[_]: Monad](alg: SpreadsheetsValues[F]) {
       updateValuesResponse <- EitherT(update(spreadsheetId, vr.range, vr, vio))
       valueRange <- EitherT(get(spreadsheetId, vr.range))
     } yield (updateValuesResponse, valueRange)).value
+
+  def appendAndGet(
+    spreadsheetId: NonEmptyString,
+    vr: ValueRange,
+    vio: ValueInputOption
+  ): F[Either[GsheetsError, (AppendValuesResponse, ValueRange)]] =
+    (for {
+      updateValuesResponse <- EitherT(append(spreadsheetId, vr.range, vr.values, vr.majorDimension, vio))
+      valueRange <- EitherT(get(spreadsheetId, vr.range))
+    } yield (updateValuesResponse, valueRange)).value
 }

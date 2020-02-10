@@ -13,4 +13,12 @@ trait SpreadsheetsValues[F[_]] {
     updates: ValueRange,
     valueInputOption: ValueInputOption
   ): F[Either[GsheetsError, UpdateValuesResponse]]
+
+  def append(spreadsheetID: NonEmptyString,
+             range: A1Notation,
+             values: List[List[String]],
+             majorDimension: Dimension = Rows,
+             valueInputOption: ValueInputOption = Raw,
+             insertDataOption: InsertDataOption = InsertRows,
+            ): F[Either[GsheetsError, AppendValuesResponse]]
 }

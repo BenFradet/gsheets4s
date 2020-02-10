@@ -10,7 +10,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import algebras._
 import model._
 
-object TestSpreadsheetsValues extends SpreadsheetsValues[Id] {
+class TestSpreadsheetsValues extends SpreadsheetsValues[Id] {
   private var data: Map[NonEmptyString, List[List[String]]] = Map.empty
 
   def get(spreadsheetID: NonEmptyString, range: A1Notation): Id[Either[GsheetsError, ValueRange]] = {
@@ -28,5 +28,17 @@ object TestSpreadsheetsValues extends SpreadsheetsValues[Id] {
     val numRows = updates.values.size
     val numCols = updates.values.headOption.foldMap(_.size)
     Right(UpdateValuesResponse(spreadsheetID.value, range, numRows, numCols, numRows * numCols))
+  }
+
+  override def append(spreadsheetID: NonEmptyString,
+                      range: A1Notation,
+                      values: List[List[String]],
+                      majorDimension: Dimension,
+                      valueInputOption: ValueInputOption,
+                      insertDataOption: InsertDataOption): Id[Either[GsheetsError, AppendValuesResponse]] = {
+    data = data + (spreadsheetID -> values)
+    val numRows = values.size
+    val numCols = values.headOption.foldMap(_.size)
+    Right(AppendValuesResponse(spreadsheetID.value, range, UpdateValuesResponse(spreadsheetID.value, range, numRows, numCols, numRows * numCols)))
   }
 }
