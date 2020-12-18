@@ -39,7 +39,7 @@ lazy val baseSettings = Seq(
 )
 
 lazy val catsVersion = "2.2.0"
-lazy val catsEffectVersion = "2.3.0"
+lazy val catsEffectVersion = "2.3.1"
 lazy val circeVersion = "0.13.0"
 lazy val refinedVersion = "0.9.19"
 lazy val attoVersion = "0.8.0"
