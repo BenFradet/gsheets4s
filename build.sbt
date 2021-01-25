@@ -1,16 +1,5 @@
-inThisBuild(List(
-  organization := "com.github.benfradet",
-  homepage := Some(url("https://github.com/BenFradet/gsheets4s")),
-  licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  developers := List(
-    Developer(
-      "BenFradet",
-      "Ben Fradet",
-      "benjamin.fradet@gmail.com",
-      url("https://benfradet.github.io")
-    )
-  )
-))
+name := "ctp-gsheets4s"
+organization := "com.itv"
 
 lazy val compilerOptions = Seq(
   "-deprecation",
@@ -74,3 +63,12 @@ lazy val gsheets4s = project.in(file("."))
       "eu.timepit" %% "refined-scalacheck" % refinedVersion
     ).map(_ % "test")
   )
+
+
+resolvers += "Artifactory Realm" at "https://itvrepos.jfrog.io/itvrepos/fp-scala-libs/"
+
+credentials += Credentials(Path.userHome / ".ivy2" / "fp-scala-libs.credentials")
+
+publishArtifact := true
+publishArtifact in Test := false
+publishTo := Some("Artifactory Realm" at "https://itvrepos.jfrog.io/itvrepos/fp-scala-libs/")
