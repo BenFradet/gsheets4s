@@ -9,11 +9,9 @@ Scala wrapper around [the Google Sheets API](https://developers.google.com/sheet
 
 ## Installation
 
-gsheets4s is available for Scala 2.12 on Maven central at the following coordinates:
+include the latest version of the library dependency in your build.sbt
 
-```bash
-"com.github.benfradet" %% "gsheets4s" % "0.2.0"
-```
+`"com.itv" %% "ctp-gsheets4s" % "0.2.0"`
 
 ## Credentials management
 
