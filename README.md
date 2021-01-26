@@ -11,7 +11,7 @@ Scala wrapper around [the Google Sheets API](https://developers.google.com/sheet
 
 include the latest version of the library dependency in your build.sbt
 
-`"com.itv" %% "ctp-gsheets4s" % "0.3.2"`
+`"com.itv" %% "ctp-gsheets4s" % "0.5.0"`
 
 ## Credentials management
 
