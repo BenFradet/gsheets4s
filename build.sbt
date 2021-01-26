@@ -64,6 +64,7 @@ lazy val gsheets4s = project.in(file("."))
     ).map(_ % "test")
   )
 
+gitVersioningSnapshotLowerBound in ThisBuild := "0.4.0"
 
 resolvers += "Artifactory Realm" at "https://itvrepos.jfrog.io/itvrepos/fp-scala-libs/"
 
