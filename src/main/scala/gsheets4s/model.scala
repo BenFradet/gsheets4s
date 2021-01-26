@@ -138,7 +138,11 @@ object model extends A1NotationLiteralSyntax {
     status: String
   )
   implicit val errorDecoder: Decoder[GsheetsError] =
-    deriveDecoder[GsheetsError].prepare(_.downField("error"))
+    deriveDecoder[GsheetsError].prepare{ j =>
+      println("gsheets errorDecoder")
+      println(j.focus.map(_.noSpaces))
+      j.downField("error")
+    }
 
   final case class Credentials(
     accessToken: String,
