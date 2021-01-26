@@ -139,8 +139,7 @@ object model extends A1NotationLiteralSyntax {
   )
   implicit val errorDecoder: Decoder[GsheetsError] =
     deriveDecoder[GsheetsError].prepare{ j =>
-      println("gsheets errorDecoder")
-      println(j.focus.map(_.noSpaces))
+      println(s"ERROR: gsheets errorDecoder raw json ${j.focus.map(_.noSpaces)}")
       j.downField("error")
     }
 

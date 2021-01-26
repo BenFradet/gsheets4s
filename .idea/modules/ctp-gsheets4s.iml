@@ -12,57 +12,57 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="sbt: com.chuusai:shapeless_2.12:2.3.3:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:simulacrum_2.12:1.0.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:simulacrum-scalafix-annotations_2.12:0.5.3:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:macro-compat_2.12:1.1.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:jawn-parser_2.12:1.0.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:cats-kernel_2.12:2.3.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:cats-free_2.12:2.2.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:cats-effect_2.12:2.3.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:cats-core_2.12:2.3.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.typelevel:alleycats-core_2.12:2.2.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.tpolecat:atto-refined_2.12:0.9.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.tpolecat:atto-core_2.12:0.9.0:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-wordspec_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-shouldmatchers_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-refspec_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-propspec_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-mustmatchers_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-matchers-core_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-funsuite_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-funspec_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-freespec_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-flatspec_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-featurespec_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-diagrams_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-core_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-compatible:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalactic:scalactic_2.12:3.2.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalacheck:scalacheck_2.12:1.15.2:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scala-sbt:test-interface:1.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-xml_2.12:1.3.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.12:2.3.2:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.12.6:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.12.6:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang:scala-compiler:2.12.6:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.parboiled:parboiled_2.12:2.2.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.apache.httpcomponents:httpcore:4.4.13:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.apache.httpcomponents:httpclient:4.5.12:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.lemonlabs:scala-uri_2.12:3.0.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-parser_2.12:0.13.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-numbers_2.12:0.13.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-jawn_2.12:0.13.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-generic_2.12:0.13.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: io.circe:circe-core_2.12:0.13.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: eu.timepit:refined_2.12:0.9.20:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: eu.timepit:refined-scalacheck_2.12:0.9.20:jar" level="project" />
-    <orderEntry type="library" name="sbt: commons-logging:commons-logging:1.2:jar" level="project" />
-    <orderEntry type="library" name="sbt: commons-codec:commons-codec:1.11:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.pepegar:hammock-core_2.12:0.11.3:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.pepegar:hammock-circe_2.12:0.11.3:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.pepegar:hammock-apache-http_2.12:0.11.3:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.github.julien-truffaut:monocle-macro_2.12:2.1.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.julien-truffaut:monocle-core_2.12:2.1.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.julien-truffaut:monocle-macro_2.12:2.1.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.pepegar:hammock-apache-http_2.12:0.11.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.pepegar:hammock-circe_2.12:0.11.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.pepegar:hammock-core_2.12:0.11.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: commons-codec:commons-codec:1.11:jar" level="project" />
+    <orderEntry type="library" name="sbt: commons-logging:commons-logging:1.2:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: eu.timepit:refined-scalacheck_2.12:0.9.20:jar" level="project" />
+    <orderEntry type="library" name="sbt: eu.timepit:refined_2.12:0.9.20:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.circe:circe-core_2.12:0.13.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.circe:circe-generic_2.12:0.13.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.circe:circe-jawn_2.12:0.13.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.circe:circe-numbers_2.12:0.13.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.circe:circe-parser_2.12:0.13.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.lemonlabs:scala-uri_2.12:3.0.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.httpcomponents:httpclient:4.5.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.httpcomponents:httpcore:4.4.13:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.parboiled:parboiled_2.12:2.2.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-compiler:2.12.6:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.12.6:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.12.6:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.12:2.3.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-xml_2.12:1.3.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scala-sbt:test-interface:1.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalacheck:scalacheck_2.12:1.15.2:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalactic:scalactic_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-compatible:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-core_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-diagrams_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-featurespec_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-flatspec_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-freespec_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-funspec_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-funsuite_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-matchers-core_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-mustmatchers_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-propspec_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-refspec_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-shouldmatchers_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-wordspec_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest_2.12:3.2.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.tpolecat:atto-core_2.12:0.9.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.tpolecat:atto-refined_2.12:0.9.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:alleycats-core_2.12:2.2.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:cats-core_2.12:2.3.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:cats-effect_2.12:2.3.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:cats-free_2.12:2.2.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:cats-kernel_2.12:2.3.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:jawn-parser_2.12:1.0.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:macro-compat_2.12:1.1.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:simulacrum-scalafix-annotations_2.12:0.5.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.typelevel:simulacrum_2.12:1.0.1:jar" level="project" />
   </component>
 </module>
