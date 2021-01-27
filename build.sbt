@@ -27,13 +27,13 @@ lazy val baseSettings = Seq(
   scalaVersion := "2.12.6",
 )
 
-lazy val catsVersion = "1.4.0"
+lazy val catsVersion = "1.6.1"
 lazy val catsEffectVersion = "1.4.0"
 lazy val circeVersion = "0.11.1"
-lazy val refinedVersion = "0.9.20"
-lazy val attoVersion = "0.9.0"
-lazy val hammockVersion = "0.11.3"
-lazy val scalacheckVersion = "1.15.2"
+lazy val refinedVersion = "0.9.9"
+lazy val attoVersion = "0.6.5"
+lazy val hammockVersion = "0.9.2"
+lazy val scalacheckVersion = "1.14.0"
 lazy val scalatestVersion = "3.2.3"
 lazy val scalaUriVersion = "3.0.0"
 
@@ -43,9 +43,12 @@ lazy val gsheets4s = project.in(file("."))
   .settings(
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % catsVersion,
+      "org.typelevel" %% "cats-kernel" % catsVersion,
       "org.typelevel" %% "cats-effect" % catsEffectVersion,
       "eu.timepit" %% "refined" % refinedVersion,
-      "io.lemonlabs" %% "scala-uri" % scalaUriVersion,
+      "io.lemonlabs" %% "scala-uri" % scalaUriVersion excludeAll(
+        ExclusionRule(organization = "org.typelevel"),
+        ExclusionRule(organization = "io.circe")),
     ) ++ Seq(
       "io.circe" %% "circe-core",
       "io.circe" %% "circe-generic",
