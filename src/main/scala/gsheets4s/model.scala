@@ -106,7 +106,10 @@ object model {
     status: String
   )
   implicit val errorDecoder: Decoder[GsheetsError] =
-    deriveDecoder[GsheetsError].prepare(_.downField("error"))
+    deriveDecoder[GsheetsError].prepare{ j =>
+      println(s"ERROR: gsheets errorDecoder raw json ${j.focus.map(_.noSpaces)}")
+      j.downField("error")
+    }
 
   final case class Credentials(
     accessToken: String,
