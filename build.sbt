@@ -1,5 +1,16 @@
-name := "ctp-gsheets4s"
-organization := "com.itv"
+inThisBuild(List(
+  organization := "com.github.benfradet",
+  homepage := Some(url("https://github.com/BenFradet/gsheets4s")),
+  licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+  developers := List(
+    Developer(
+      "BenFradet",
+      "Ben Fradet",
+      "benjamin.fradet@gmail.com",
+      url("https://benfradet.github.io")
+    )
+  )
+))
 
 lazy val compilerOptions = Seq(
   "-deprecation",
@@ -27,15 +38,14 @@ lazy val baseSettings = Seq(
   scalaVersion := "2.12.6",
 )
 
-lazy val catsVersion = "1.6.1"
-lazy val catsEffectVersion = "1.4.0"
-lazy val circeVersion = "0.11.1"
-lazy val refinedVersion = "0.9.9"
-lazy val attoVersion = "0.6.5"
-lazy val hammockVersion = "0.9.2"
+lazy val catsVersion = "1.4.0"
+lazy val catsEffectVersion = "1.0.0"
+lazy val circeVersion = "0.10.0"
+lazy val refinedVersion = "0.9.2"
+lazy val attoVersion = "0.6.3"
+lazy val hammockVersion = "0.8.7"
 lazy val scalacheckVersion = "1.14.0"
-lazy val scalatestVersion = "3.2.3"
-lazy val scalaUriVersion = "3.0.0"
+lazy val scalatestVersion = "3.0.5"
 
 lazy val gsheets4s = project.in(file("."))
   .settings(name := "gsheets4s")
@@ -43,12 +53,8 @@ lazy val gsheets4s = project.in(file("."))
   .settings(
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % catsVersion,
-      "org.typelevel" %% "cats-kernel" % catsVersion,
       "org.typelevel" %% "cats-effect" % catsEffectVersion,
-      "eu.timepit" %% "refined" % refinedVersion,
-      "io.lemonlabs" %% "scala-uri" % scalaUriVersion excludeAll(
-        ExclusionRule(organization = "org.typelevel"),
-        ExclusionRule(organization = "io.circe")),
+      "eu.timepit" %% "refined" % refinedVersion
     ) ++ Seq(
       "io.circe" %% "circe-core",
       "io.circe" %% "circe-generic",
@@ -58,7 +64,6 @@ lazy val gsheets4s = project.in(file("."))
       "org.tpolecat" %% "atto-refined"
     ).map(_ % attoVersion) ++ Seq(
       "com.pepegar" %% "hammock-core",
-      "com.pepegar" %% "hammock-apache-http",
       "com.pepegar" %% "hammock-circe"
     ).map(_ % hammockVersion) ++ Seq(
       "org.scalatest" %% "scalatest" % scalatestVersion,
@@ -66,13 +71,3 @@ lazy val gsheets4s = project.in(file("."))
       "eu.timepit" %% "refined-scalacheck" % refinedVersion
     ).map(_ % "test")
   )
-
-gitVersioningSnapshotLowerBound in ThisBuild := "0.4.0"
-
-resolvers += "Artifactory Realm" at "https://itvrepos.jfrog.io/itvrepos/fp-scala-libs/"
-
-credentials += Credentials(Path.userHome / ".ivy2" / "fp-scala-libs.credentials")
-
-publishArtifact := true
-publishArtifact in Test := false
-publishTo := Some("Artifactory Realm" at "https://itvrepos.jfrog.io/itvrepos/fp-scala-libs/")
