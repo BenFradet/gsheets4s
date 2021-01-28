@@ -7,6 +7,7 @@ import cats.Show
 import cats.syntax.apply._
 import cats.syntax.either._
 import cats.syntax.show._
+import com.typesafe.scalalogging.StrictLogging
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.boolean._
 import eu.timepit.refined.char._
@@ -15,7 +16,7 @@ import eu.timepit.refined.numeric._
 import io.circe.{Decoder, DecodingFailure, Encoder, HCursor}
 import io.circe.generic.semiauto._
 
-object model {
+object model extends StrictLogging{
   type ValidCol = NonEmpty And Forall[UpperCase]
   type Col = String Refined ValidCol
   type ValidRow = Positive
@@ -105,11 +106,20 @@ object model {
     message: String,
     status: String
   )
+
+  val fallbackdecoder: Decoder[GsheetsError] =
+    new Decoder[GsheetsError] {
+      final def apply(c: HCursor): Decoder.Result[GsheetsError] = {
+        logger.error(s"gsheets errorDecoder raw json ${c.focus.map(_.noSpaces)}")
+        val error = c.focus.map(_.noSpaces).getOrElse("no json in response")
+        GsheetsError(400, error, "").asRight[DecodingFailure]
+      }
+    }
+
   implicit val errorDecoder: Decoder[GsheetsError] =
     deriveDecoder[GsheetsError].prepare{ j =>
-      println(s"ERROR: gsheets errorDecoder raw json ${j.focus.map(_.noSpaces)}")
       j.downField("error")
-    }
+    }.handleErrorWith(_ => fallbackdecoder)
 
   final case class Credentials(
     accessToken: String,

@@ -43,6 +43,7 @@ lazy val gsheets4s = project.in(file("."))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % catsVersion,
       "org.typelevel" %% "cats-effect" % catsEffectVersion,
+      "com.typesafe.scala-logging" %% "scala-logging"             % "3.9.2",
       "eu.timepit" %% "refined" % refinedVersion
     ) ++ Seq(
       "io.circe" %% "circe-core",
