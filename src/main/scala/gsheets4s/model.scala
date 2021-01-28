@@ -90,7 +90,7 @@ object model extends StrictLogging{
   final case class ValueRange(
     range: A1Notation,
     majorDimension: Dimension,
-    values: List[List[String]]
+    values: List[List[String]] // Todo this value should be optional incase the sheet is empty
   )
 
   final case class UpdateValuesResponse(
@@ -110,9 +110,9 @@ object model extends StrictLogging{
   val fallbackdecoder: Decoder[GsheetsError] =
     new Decoder[GsheetsError] {
       final def apply(c: HCursor): Decoder.Result[GsheetsError] = {
-        logger.error(s"gsheets errorDecoder raw json ${c.focus.map(_.noSpaces)}")
-        val error = c.focus.map(_.noSpaces).getOrElse("no json in response")
-        GsheetsError(400, error, "").asRight[DecodingFailure]
+        val msg = s"gsheets4s errorDecoder raw json ${c.focus.map(_.noSpaces)}. Have you added a row to the sheet? If not please add one ;)"
+        logger.error(msg)
+        GsheetsError(400, msg, "").asRight[DecodingFailure]
       }
     }
 
