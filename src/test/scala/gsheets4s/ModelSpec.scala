@@ -49,11 +49,12 @@ object ModelSpec extends Properties("model") {
   property("Either decoder fallback") = forAll { e: Either[GsheetsError, ValueRange] =>
     e match {
       case Left(l) =>
-        val x = decode[Either[GsheetsError, ValueRange]](Json.obj(("error-V2", l.asJson)).noSpaces)
-        val y = Right(Left(GsheetsError(400, Json.obj(("error-V2", l.asJson)).noSpaces, "")))
+        val js = Json.obj(("error-V2", l.asJson)).noSpaces
+        val x = decode[Either[GsheetsError, ValueRange]](js)
+        val y = Right(Left(GsheetsError(400, s"gsheets4s errorDecoder raw json Some($js). Have you added a row to the sheet? If not please add one ;)", "")))
         x == y
       case Right(r) =>
         decode[Either[GsheetsError, ValueRange]](r.asJson.noSpaces) == Right(e)
     }
-  }
+  } //${c.focus.map(_.noSpaces)}
 }
