@@ -38,13 +38,13 @@ lazy val baseSettings = Seq(
   scalaVersion := "2.12.6",
 )
 
-lazy val catsVersion = "2.4.2"
-lazy val catsEffectVersion = "2.4.2"
+lazy val catsVersion = "2.3.1"
+lazy val catsEffectVersion = "2.3.2"
 lazy val circeVersion = "0.13.0"
 lazy val refinedVersion = "0.9.20"
 lazy val attoVersion = "0.9.1"
 lazy val hammockVersion = "0.11.3"
-lazy val scalacheckVersion = "1.15.2"
+lazy val scalacheckVersion = "1.15.3"
 lazy val scalatestVersion = "3.2.3"
 lazy val scalaUriVersion = "3.0.0"
 
