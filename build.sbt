@@ -35,7 +35,7 @@ lazy val baseSettings = Seq(
   scalacOptions in (Test, console) ~= {
     _.filterNot(Set("-Ywarn-unused-import"))
   },
-  scalaVersion := "2.12.6",
+  scalaVersion := "2.12.13",
 )
 
 lazy val catsVersion = "2.4.2"
