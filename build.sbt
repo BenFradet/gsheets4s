@@ -46,7 +46,7 @@ lazy val attoVersion = "0.9.2"
 lazy val hammockVersion = "0.11.3"
 lazy val scalacheckVersion = "1.15.3"
 lazy val scalatestVersion = "3.2.6"
-lazy val scalaUriVersion = "3.0.0"
+lazy val scalaUriVersion = "3.1.0"
 
 lazy val gsheets4s = project.in(file("."))
   .settings(name := "gsheets4s")
