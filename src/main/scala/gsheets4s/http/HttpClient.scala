@@ -4,7 +4,6 @@ package http
 import cats.Monad
 import cats.data.NonEmptyList
 import cats.effect.Sync
-import cats.effect.concurrent.Ref
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 import cats.syntax.show._
@@ -15,6 +14,7 @@ import io.circe.{Encoder, Decoder}
 import io.lemonlabs.uri.Url
 
 import model.{Credentials, GsheetsError}
+import cats.effect.Ref
 
 trait HttpRequester[F[_]] {
   def request[O](uri: Uri, method: Method)(implicit d: Decoder[O]): F[O]
