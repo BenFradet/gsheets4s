@@ -38,7 +38,7 @@ lazy val baseSettings = Seq(
   scalaVersion := "2.12.6",
 )
 
-lazy val catsVersion = "2.5.0"
+lazy val catsVersion = "2.6.0"
 lazy val catsEffectVersion = "2.4.1"
 lazy val circeVersion = "0.13.0"
 lazy val refinedVersion = "0.9.23"
