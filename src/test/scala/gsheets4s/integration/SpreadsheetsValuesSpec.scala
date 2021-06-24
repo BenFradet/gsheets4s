@@ -4,6 +4,7 @@ package integration
 import cats.effect.IO
 import cats.effect.concurrent.Ref
 import eu.timepit.refined.auto._
+import eu.timepit.refined.types.string.NonEmptyString
 import org.scalatest._
 
 import model._
@@ -21,7 +22,7 @@ class SpreadsheetsValuesSpec extends AnyFlatSpec {
     clientSecret <- sys.env.get("GSHEETS4S_CLIENT_SECRET")
   } yield Credentials(accessToken, refreshToken, clientId, clientSecret)
 
-  val spreadsheetID = "1tk2S_A4LZfeZjoMskbfFXO42_b75A7UkSdhKaQZlDmA"
+  val spreadsheetID: NonEmptyString = "1tk2S_A4LZfeZjoMskbfFXO42_b75A7UkSdhKaQZlDmA"
   val not = SheetNameRangeNotation("Sheet1",
     Range(ColRowPosition("A", 1), ColRowPosition("B", 2)))
   val vr = ValueRange(not, Rows, List(List("1", "2"), List("3", "4")))
@@ -36,7 +37,7 @@ class SpreadsheetsValuesSpec extends AnyFlatSpec {
     } yield prog).unsafeRunSync()
     assert(res.isRight)
     val Right((uvr, vr2)) = res
-    assert(uvr.spreadsheetId == spreadsheetID)
+    assert(uvr.spreadsheetId == spreadsheetID.value)
     assert(uvr.updatedRange == vr.range)
     assert(vr.range == vr2.range)
     assert(vr.values == vr2.values)
@@ -65,7 +66,7 @@ class SpreadsheetsValuesSpec extends AnyFlatSpec {
     } yield prog).unsafeRunSync()
     assert(res.isRight)
     val Right((uvr, vr2)) = res
-    assert(uvr.spreadsheetId == spreadsheetID)
+    assert(uvr.spreadsheetId == spreadsheetID.value)
     assert(uvr.updatedRange == vr.range)
     assert(vr.range == vr2.range)
     assert(vr.values == vr2.values)
