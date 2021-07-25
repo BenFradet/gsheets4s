@@ -1,12 +1,12 @@
 package gsheets4s
 
 import cats.effect.Sync
-import cats.effect.concurrent.Ref
 
 import algebras._
 import http._
 import interpreters._
 import model._
+import cats.effect.Ref
 
 case class GSheets4s[F[_]](
   spreadsheetsValues: SpreadsheetsValues[F]
