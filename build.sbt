@@ -44,7 +44,7 @@ lazy val circeVersion = "0.14.1"
 lazy val refinedVersion = "0.9.28"
 lazy val attoVersion = "0.9.5"
 lazy val hammockVersion = "0.11.3"
-lazy val scalacheckVersion = "1.15.4"
+lazy val scalacheckVersion = "1.16.0"
 lazy val scalatestVersion = "3.2.11"
 lazy val scalaUriVersion = "4.0.1"
 
