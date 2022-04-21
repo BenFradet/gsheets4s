@@ -123,7 +123,7 @@ Here's the list of currently supported endpoints:
   - [ ] `copyTo`
 
 - [spreadsheets.values](https://developers.google.com/sheets/api/reference/rest/#rest-resource-v4spreadsheetsvalues)
-  - [ ] `append`
+  - [x] `append`
   - [ ] `batchClear`
   - [ ] `batchClearByDataFilter`
   - [ ] `batchGet`
